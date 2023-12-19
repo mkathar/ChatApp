@@ -1,0 +1,42 @@
+.ourWork {
+  width: 70%;
+  height: 100vh;
+  background-color: #6565ee;
+  color: white;
+  position: relative;
+  &__group {
+    width: 90%;
+    border-bottom: 1px solid white;
+    margin: 15px auto;
+    &__title {
+      margin: 5px auto;
+      padding: 0;
+    }
+  }
+  &__content {
+    position: absolute;
+    bottom: 50px;
+    display: flex;
+    justify-content: space-evenly;
+    &__group {
+      &-1 {
+        width: 25%;
+      }
+      &-2 {
+        margin-top: 100px;
+        width: 25%;
+      }
+      &-3 {
+        margin-top: 200px;
+        width: 25%;
+      }
+      &__title {
+        color: #fcf;
+        text-decoration: none;
+        font-size: 24px;
+        font-weight: 600;
+        display: block;
+      }
+    }
+  }
+}

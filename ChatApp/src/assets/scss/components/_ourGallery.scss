@@ -1,0 +1,18 @@
+.ourGallery {
+  width: 70%;
+  height: 100vh;
+  background-image: url("../src/assets/img/section-3-bg.jpg");
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  &__title {
+    text-align: right;
+    margin-right: 4rem;
+    color: #5151f3;
+  }
+  &__slider {
+    align-self: center;
+    width: 90%;
+  }
+}

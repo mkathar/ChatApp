@@ -1,0 +1,27 @@
+.header {
+  color: white;
+  display: flex;
+  justify-content: flex-end;
+  height: 70px;
+  align-items: center;
+  background-color: #6665ee;
+
+  &__group {
+    display: flex;
+    column-gap: 30px;
+    align-items: center;
+    &__box {
+      display: flex;
+      display: flex;
+      align-items: center;
+      column-gap: 10px;
+      margin-right: 50px;
+      &__img {
+        border-radius: 100%;
+      }
+      &__name {
+        font-size: 24px;
+      }
+    }
+  }
+}

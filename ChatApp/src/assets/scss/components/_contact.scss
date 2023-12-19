@@ -1,0 +1,89 @@
+.contact {
+  width: 70%;
+  background-color: #6565ee;
+  height: 100vh;
+  padding-top: 5rem;
+  &__title {
+    margin-bottom: 5rem;
+    color: white;
+  }
+  &__content {
+    justify-content: space-around;
+
+    column-gap: 50px;
+    display: flex;
+
+    &__form {
+      display: flex;
+      flex-direction: column;
+      width: 30%;
+      row-gap: 50px;
+      &__name {
+        background-color: #6565ee;
+        border: none;
+        border-bottom: 1px solid white;
+        padding-bottom: 10px;
+        &::placeholder {
+          color: white;
+          font-weight: 500;
+          font-size: 20px;
+        }
+      }
+
+      &__email {
+        background-color: #6565ee;
+        border: none;
+        border-bottom: 1px solid white;
+        padding-bottom: 10px;
+        &::placeholder {
+          color: white;
+          font-weight: 500;
+          font-size: 20px;
+        }
+      }
+      &__message {
+        background-color: #6565ee;
+        border: none;
+        padding-bottom: 10px;
+        border-bottom: 1px solid white;
+        &::placeholder {
+          color: white;
+          font-weight: 500;
+          font-size: 20px;
+        }
+      }
+      &__btn {
+        margin-top: 50px;
+        padding: 15px 35px;
+        width: 150px;
+        align-self: flex-end;
+      }
+    }
+    &__communication {
+      width: 30%;
+      color: white;
+      &__tel {
+        column-gap: 10px;
+        display: flex;
+        align-items: center;
+      }
+      &__mail {
+        column-gap: 10px;
+        display: flex;
+        align-items: center;
+      }
+      &__web {
+        column-gap: 10px;
+        display: flex;
+        align-items: center;
+      }
+    }
+
+    &__map {
+      width: 20%;
+      background-image: url("../src/assets/img/gallery-img-01.jpg");
+      background-repeat: no-repeat;
+      background-size: cover;
+    }
+  }
+}

@@ -1,0 +1,42 @@
+.signIn {
+  width: 70%;
+  background-color: #6565ee;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  &__form {
+    width: 30%;
+    height: 70vh;
+    background-color: rgb(215, 202, 235);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    row-gap: 7em;
+
+    &__group {
+      width: 70%;
+      display: flex;
+      flex-direction: column;
+      row-gap: 2em;
+      &__box {
+        display: flex;
+        justify-content: space-between;
+        &__ques {
+          font-size: 12px;
+        }
+        &__btn {
+          background-color: #6665ee;
+          padding: 10px 30px;
+        }
+      }
+      &__input {
+        background-color: rgb(215, 202, 235);
+        border: none;
+        border-bottom: 1px solid black;
+        outline: 0;
+      }
+    }
+  }
+}

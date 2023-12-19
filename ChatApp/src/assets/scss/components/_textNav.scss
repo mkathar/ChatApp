@@ -1,0 +1,44 @@
+.nav {
+  display: flex;
+  justify-content: space-between;
+  background-color: white;
+  height: 50px;
+  align-items: center;
+  padding: 30px;
+  &__group {
+    display: flex;
+    column-gap: 15px;
+    align-items: center;
+    &__img {
+      border-radius: 100%;
+    }
+    &--1 {
+      display: flex;
+      column-gap: 100px;
+      align-items: center;
+      &__box {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        text-align: center;
+        align-items: center;
+        &__title {
+          color: gray;
+        }
+        &__dot {
+          margin-top: 5px;
+          height: 10px;
+          width: 10px;
+          border-radius: 100%;
+          background-color: green;
+        }
+      }
+    }
+  }
+  &__button {
+    border: none;
+    border-radius: 100%;
+    background-color: rgba(255, 255, 255, 0);
+    cursor: pointer;
+  }
+}

@@ -1,0 +1,19 @@
+.outgoingMessage {
+  display: flex;
+  justify-content: flex-end;
+  height: fit-content;
+  padding: 50px 30px 30px 30px;
+  column-gap: 10px;
+  &__img {
+    width: 40px;
+    height: 40px;
+    border-radius: 100%;
+  }
+  &__group {
+    border-radius: 15px 0px 15px 15px;
+    background-color: #bbbbbb;
+    height: fit-content;
+    padding: 15px;
+    max-width: 500px;
+  }
+}
