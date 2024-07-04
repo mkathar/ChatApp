@@ -2,7 +2,7 @@ import { createWebHistory, createRouter } from "vue-router";
 
 import welcome from "../pages/welcome.vue";
 import process from "../pages/process.vue";
-import text from "../pages/text.vue";
+import textArea from "../pages/textArea.vue";
 const routes = [
   {
     path: "/",
@@ -22,7 +22,7 @@ const routes = [
   {
     path: "/text",
     name: "text",
-    component: text,
+    component: textArea,
   },
 ];
 

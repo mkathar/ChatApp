@@ -26,11 +26,16 @@
         </div>
       </div>
     </div>
+    <div v-if="passwordControl">
+      <h1>şifren Yanlıştı</h1>
+
+      <button @click="selam">123</button>
+    </div>
   </div>
 </template>
 <script>
+import { mapState } from "vuex";
 import { Icon } from "../icon";
-import axiosInstance from "../services/base/baseURL";
 
 export default {
   data() {
@@ -45,9 +50,17 @@ export default {
         currentUserMail: this.email,
         currentUserPassword: this.password,
       };
-
       this.$store.commit("loginUser", authentication);
     },
+    selam() {
+      const answer = false;
+      this.$store.commit("passwordControl", answer);
+    },
+  },
+  computed: {
+    ...mapState({
+      passwordControl: (state) => state.passwordControl,
+    }),
   },
 };
 </script>

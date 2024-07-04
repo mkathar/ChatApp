@@ -3,33 +3,26 @@
     <SidebarMessage />
     <div class="textArea">
       <TextHeader />
-      <div v-if="$store.state.textActive">
-        <TextNav />
-        <Message />
-        <TextWrite />
-      </div>
+      <Text />
     </div>
   </div>
 </template>
 
 <script>
-import message from "../components/message.vue";
 import sidebarMessage from "../components/sidebarMessage.vue";
 import { Icon } from "../icon";
 import textHeader from "../components/textHeader.vue";
-import textWrite from "../components/textWrite.vue";
+
 import { mapState } from "vuex";
-import textNav from "../components/textNav.vue";
+import text from "../components/text.vue";
 
 export default {
   setup() {},
   components: {
-    Message: message,
     SidebarMessage: sidebarMessage,
     Icon: Icon,
     TextHeader: textHeader,
-    TextWrite: textWrite,
-    TextNav: textNav,
+    Text: text,
   },
   watch: {
     $route(to, from) {

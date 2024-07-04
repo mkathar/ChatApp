@@ -16,6 +16,7 @@ export default {
       this.$store.dispatch("getAllConversations");
 
       this.$store.dispatch("getConversationPartners");
+      console.log("route path değişti", this.$route.fullPath);
     },
   },
 };

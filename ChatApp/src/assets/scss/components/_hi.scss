@@ -4,8 +4,10 @@
   height: 100vh;
   background-repeat: no-repeat;
   background-size: cover;
+
   &__text {
     background-color: #6565ee97;
+
     width: 50%;
     font-size: 20px;
     padding: 38px 68px;
@@ -22,5 +24,11 @@
     background-color: #6565ee97;
     color: white;
     margin: 13rem 0 0 15rem;
+  }
+}
+@media only screen and (max-width: 600px) {
+  .sectionHi__group {
+    background-color: red;
+    font-size: 5px;
   }
 }

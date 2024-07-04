@@ -5,7 +5,7 @@
       <h1>KATAR Chat :)</h1>
     </div>
     <p class="sectionHi__text">
-      Your simplest HTML template, the most amazing page ever, yet free!
+      Don't worry about the distance between you and your loved ones anymore.
     </p>
   </div>
 </template>

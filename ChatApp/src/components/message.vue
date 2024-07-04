@@ -1,6 +1,6 @@
 <template>
   <div class="message-container">
-    <div v-if="conversationMessages">
+    <div class="message-container__t" v-if="conversationMessages && textActive">
       <div
         v-for="message in conversationMessages.Mesajlar"
         :key="message.message_id"
@@ -17,9 +17,13 @@
         >
           <p>{{ message.message_text }}</p>
           <p>{{ message.message_time }}</p>
-          <!-- Diğer mesaj özelliklerini buraya ekleyebilirsiniz -->
         </div>
       </div>
+    </div>
+    <div class="message-container__noMessage" v-if="!textActive">
+      <h1 class="message-container__noMessage__content">
+        Henüz bir mesaj başlatmadın...
+      </h1>
     </div>
   </div>
 </template>
@@ -47,11 +51,16 @@ export default {
     isReceivedMessage(message) {
       return message.receiver_id === this.currentUser.user_id;
     },
+    selam() {
+      console.log(this.textActive);
+    },
   },
+
   computed: {
     ...mapState({
       conversationMessages: (state) => state.conversationMessages,
       currentUser: (state) => state.currentUser,
+      textActive: (state) => state.textActive,
     }),
     conversationMessagess() {
       const sortedMessages = this.conversationMessages.Mesajlar.sort(
@@ -70,6 +79,11 @@ export default {
     },
     currentUserID() {
       return 0;
+    },
+  },
+  watch: {
+    textActive(to, from) {
+      console.log(this.textActive);
     },
   },
 };

@@ -8,8 +8,8 @@
           >.01 Get Account</router-link
         >
         <p class="ourWork__content__group__description">
-          Simply Amazed is free HTML template provided by Tooplate website.
-          Please tell your friends about our website. Thank you.
+          Take the first step towards seamless communication with your loved
+          ones by creating your account today.
         </p>
       </div>
       <div class="ourWork__content__group-2">
@@ -19,16 +19,18 @@
           >.02 Login to App</router-link
         >
         <p class="ourWork__content__group__description">
-          Simply Amazed is free HTML template provided by Tooplate website.
-          Please tell your friends about our website. Thank you.
+          Please enter your username and password to access your account. Click
+          on the title to begin communicating effortlessly with your loved ones!
         </p>
       </div>
       <div class="ourWork__content__group-3">
         <Icon name="message" :size="100" />
         <h1 class="ourWork__content__group__title">.03 Send Message</h1>
         <p class="ourWork__content__group__description">
-          Simply Amazed is free HTML template provided by Tooplate website.
-          Please tell your friends about our website. Thank you.
+          Now, our comprehensive services are fully accessible to you. Take
+          advantage of seamless connectivity to stay in touch with your loved
+          ones comfortably and effortlessly, all with just a press of the send
+          button.
         </p>
       </div>
     </div>

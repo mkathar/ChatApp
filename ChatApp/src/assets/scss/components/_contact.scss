@@ -2,10 +2,14 @@
   width: 70%;
   background-color: #6565ee;
   height: 100vh;
-  padding-top: 5rem;
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   &__title {
     margin-bottom: 5rem;
     color: white;
+    align-self: start;
   }
   &__content {
     justify-content: space-around;

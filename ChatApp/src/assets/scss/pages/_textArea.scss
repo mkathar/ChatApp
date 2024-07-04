@@ -36,7 +36,22 @@
   }
 }
 .message-container {
-  overflow: scroll;
-  overflow: hidden;
+  &__t {
+    overflow: auto;
+    height: 65vh;
+    scrollbar-width: none;
+  }
+  height: 60vh;
+  &__noMessage {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &__content {
+      color: rgb(55, 55, 55);
+      letter-spacing: 5px;
+      text-shadow: 2px 2px 0px gray;
+    }
+  }
 }
 //#e2e0e0

@@ -8,7 +8,7 @@
       />
       <Icon name="send" @click="sendMessage" />
     </div>
-    <button @click="selam">abc</button>
+
     <img
       class="textArea__group__img"
       src="https://picsum.photos/id/221/40/40"
@@ -26,16 +26,6 @@ export default {
     return {};
   },
   methods: {
-    selam() {
-      console.log(
-        "conversationMessages",
-        this.conversationMessages,
-        "conversationPartners",
-        this.conversationPartners,
-        "allConversations",
-        this.allConversations
-      );
-    },
     async sendMessage() {
       var currentdate = new Date();
       var datetime =

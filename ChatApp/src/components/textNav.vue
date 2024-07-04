@@ -1,5 +1,5 @@
 <template>
-  <nav class="nav">
+  <nav class="nav" v-if="textActive">
     <div class="nav__group">
       <img
         class="nav__group__img"
@@ -30,6 +30,9 @@
       <Icon name="close" />
     </button>
   </nav>
+  <nav class="nav" v-if="!textActive">
+    <p></p>
+  </nav>
 </template>
 
 <script>
@@ -52,8 +55,12 @@ export default {
   computed: {
     ...mapState({
       conversationMessages: (state) => state.conversationMessages,
+      textActive: (state) => state.textActive,
     }),
   },
   mounted() {},
+  watch: {
+    textActive(to, from) {},
+  },
 };
 </script>

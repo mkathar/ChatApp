@@ -37,6 +37,12 @@
   margin: 13rem 0 0 15rem;
 }
 
+@media only screen and (max-width: 600px) {
+  .sectionHi__group {
+    background-color: red;
+    font-size: 5px;
+  }
+}
 .sidebar {
   position: fixed;
   right: 0;
@@ -138,11 +144,15 @@
   width: 70%;
   background-color: #6565ee;
   height: 100vh;
-  padding-top: 5rem;
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 .contact__title {
   margin-bottom: 5rem;
   color: white;
+  align-self: start;
 }
 .contact__content {
   justify-content: space-around;
@@ -563,6 +573,20 @@
 }
 
 .message-container {
-  overflow: scroll;
-  overflow: hidden;
+  height: 60vh;
+}
+.message-container__t {
+  overflow: auto;
+  height: 65vh;
+  scrollbar-width: none;
+}
+.message-container__noMessage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.message-container__noMessage__content {
+  color: rgb(55, 55, 55);
+  letter-spacing: 5px;
+  text-shadow: 2px 2px 0px gray;
 }/*# sourceMappingURL=main.css.map */

@@ -10,6 +10,7 @@ const store = createStore({
     conversationPartners: [],
     conversationMessages: [],
     yourVariable: null,
+    passwordControl: false,
   },
   mutations: {
     async signIn(state, newUser) {
@@ -39,7 +40,7 @@ const store = createStore({
           router.push("/text");
         })
         .catch((error) => {
-          console.log("kullanıcı kimlik");
+          state.passwordControl = true;
           console.error(error);
         });
     },
@@ -72,6 +73,9 @@ const store = createStore({
     },
     setVariable(state, newValue) {
       state.yourVariable = newValue;
+    },
+    passwordControl(state, isAnswer) {
+      state.passwordControl = isAnswer;
     },
   },
   actions: {
