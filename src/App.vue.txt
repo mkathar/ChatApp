@@ -1,0 +1,24 @@
+<template>
+    <RouterView :key="$route.fullPath"></RouterView>
+</template>
+
+<script>
+import { mapActions, mapGetters } from 'vuex';
+
+export default {
+  name: 'App',
+  computed: {
+    ...mapGetters('auth', ['isAuthenticated'])
+  },
+  methods: {
+    ...mapActions('auth', ['fetchCurrentUser']),
+    ...mapActions('conversations', ['fetchConversations']),
+  },
+  created() {
+    if (this.isAuthenticated) {
+      this.fetchCurrentUser();
+      this.fetchConversations();
+    }
+  }
+}
+</script>
