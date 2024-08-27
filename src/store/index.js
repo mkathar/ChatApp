@@ -3,7 +3,7 @@ import auth from "./modules/auth";
 import chats from "./modules/chats";
 import messages from "./modules/messages";
 import { io } from "socket.io-client";
-
+import ui from "./modules/ui";
 export default createStore({
   state: {
     socket: null,
@@ -65,5 +65,6 @@ export default createStore({
     auth,
     chats,
     messages,
+    ui,
   },
 });

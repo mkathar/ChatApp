@@ -34,7 +34,7 @@ export default {
     },
     handleLogout() {
       this.logout(() => {
-        this.$router.push("/"); // Redirect to home page after logout
+        this.$router.push("/");
       });
     },
   },

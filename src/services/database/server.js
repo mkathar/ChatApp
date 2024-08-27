@@ -18,7 +18,6 @@ const io = new Server(server, {
   },
 });
 
-// Middleware
 app.use(
   cors({
     origin: "http://localhost:5173",
@@ -36,12 +35,11 @@ app.use(
       secure: process.env.NODE_ENV === "production",
       httpOnly: true,
       sameSite: "lax",
-      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+      maxAge: 24 * 60 * 60 * 1000,
     },
   })
 );
 
-// JWT verification middleware
 const verifyToken = (req, res, next) => {
   const token = req.cookies.token;
   if (!token) {
@@ -56,7 +54,6 @@ const verifyToken = (req, res, next) => {
   }
 };
 
-// Routes
 app.post("/register", async (req, res) => {
   const { username, password, email, bio } = req.body;
   try {
@@ -121,7 +118,7 @@ app.post("/login", async (req, res) => {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "strict",
-        maxAge: 3600000, // 1 hour
+        maxAge: 3600000,
       });
       res.status(200).json({
         message: "Login successful",
@@ -153,10 +150,8 @@ app.get("/profile", verifyToken, async (req, res) => {
 
 app.get("/logout", verifyToken, async (req, res) => {
   try {
-    // Kullanıcının son görülme zamanını güncelle
     await dbOperations.updateLastSeen(req.userId);
 
-    // Oturumu sonlandır
     req.session.destroy((err) => {
       if (err) {
         console.error("Session destruction error:", err);
@@ -174,7 +169,6 @@ app.get("/user-chats", verifyToken, async (req, res) => {
   try {
     const chats = await dbOperations.getChatsForUser(req.userId);
 
-    // Son görülme zamanını güncelle
     await dbOperations.updateLastSeen(req.userId);
 
     res.status(200).json(chats);
@@ -198,7 +192,60 @@ app.post("/messages", verifyToken, async (req, res) => {
     res.status(500).json({ error: "Error creating message" });
   }
 });
+app.delete("/chats/:chatId", verifyToken, async (req, res) => {
+  const chatId = req.params.chatId;
+  try {
+    await dbOperations.deleteChat(chatId);
+    res.status(200).json({ message: "Chat deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting chat:", error);
+    res
+      .status(500)
+      .json({ error: "An error occurred while deleting the chat" });
+  }
+});
 
+app.post("/new-chat", verifyToken, async (req, res) => {
+  const { participants, chatName, isGroup } = req.body;
+  const creatorId = req.userId;
+
+  try {
+    let newChat;
+    if (isGroup) {
+      newChat = await dbOperations.createGroupChat(
+        chatName,
+        creatorId,
+        participants
+      );
+    } else {
+      newChat = await dbOperations.createPrivateChat(
+        creatorId,
+        participants[0]
+      );
+    }
+
+    if (!newChat.chat_id || !newChat.chat_type) {
+      throw new Error("Invalid chat object created");
+    }
+
+    newChat.display_name = isGroup
+      ? chatName
+      : await dbOperations.getUsernameById(participants[0]);
+
+    console.log("New chat created:", newChat);
+
+    participants.forEach((userId) => {
+      io.to(userId.toString()).emit("new chat", newChat);
+    });
+
+    res.status(201).json(newChat);
+  } catch (error) {
+    console.error("Error creating new chat:", error);
+    res
+      .status(500)
+      .json({ error: "Failed to create new chat", details: error.message });
+  }
+});
 app.get("/messages/:chatId", verifyToken, async (req, res) => {
   const chatId = req.params.chatId;
   try {
@@ -207,6 +254,61 @@ app.get("/messages/:chatId", verifyToken, async (req, res) => {
   } catch (error) {
     console.error("Error fetching messages:", error);
     res.status(500).json({ error: "Error fetching messages" });
+  }
+});
+app.get("/users/search", verifyToken, async (req, res) => {
+  const { query } = req.query;
+
+  if (!query) {
+    return res.status(400).json({ error: "Arama sorgusu gerekli" });
+  }
+
+  try {
+    const users = await dbOperations.searchUsers(query);
+    res.json(users);
+  } catch (error) {
+    console.error("Kullanıcı arama hatası:", error);
+    console.error("Hata stack:", error.stack);
+    res.status(500).json({
+      error: "Kullanıcı araması sırasında bir hata oluştu",
+      details: error.message,
+    });
+  }
+});
+app.post("/new-chat", verifyToken, async (req, res) => {
+  const { participants, chatName, isGroup } = req.body;
+  const creatorId = req.userId;
+
+  try {
+    let newChat;
+    if (isGroup) {
+      newChat = await dbOperations.createGroupChat(
+        chatName,
+        creatorId,
+        participants
+      );
+    } else {
+      newChat = await dbOperations.createPrivateChat(
+        creatorId,
+        participants[0]
+      );
+    }
+
+    if (!newChat.chat_id || !newChat.chat_type) {
+      throw new Error("Invalid chat object created");
+    }
+
+    newChat.display_name = isGroup
+      ? chatName
+      : await dbOperations.getUsernameById(participants[0]);
+
+    console.log("New chat created:", newChat);
+    res.status(201).json(newChat);
+  } catch (error) {
+    console.error("Error creating new chat:", error);
+    res
+      .status(500)
+      .json({ error: "Failed to create new chat", details: error.message });
   }
 });
 
@@ -224,10 +326,8 @@ io.on("connection", (socket) => {
 
   socket.on("new message", async (messageData) => {
     try {
-      // Mesajı sohbet odasındaki diğer kullanıcılara gönder
       socket.to(messageData.chat_id).emit("message received", messageData);
 
-      // Sohbet listesini güncelleme
       const updatedChats = await dbOperations.getChatsForUser(
         messageData.sender_id
       );

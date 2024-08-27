@@ -5,7 +5,7 @@
         {{ getInitials(activeChat.display_name) }}
       </div>
       <p class="nav__group__name">{{ activeChat.display_name }}</p>
-      <p class="">{{ activeChat.display_name }}</p>
+      <p class="">{{ filteredChats.display_name }}</p>
     </div>
     <div class="nav__group">
       <Icon name="phone" />
@@ -22,8 +22,23 @@ export default {
   components: {
     Icon,
   },
+
   computed: {
     ...mapState("chats", ["activeChat"]),
+    ...mapState("chats", ["chats", "activeChat", "loadingChats", "error"]),
+
+    filteredChats() {
+      if (!this.chats) return [];
+      return this.chats.filter((chat) => {
+        if (!chat || !chat.display_name) {
+          console.warn("Invalid chat object:", chat);
+          return false;
+        }
+        return chat.display_name
+          .toLowerCase()
+          .includes(this.searchQuery.toLowerCase());
+      });
+    },
   },
   methods: {
     getInitials(name) {

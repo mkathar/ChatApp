@@ -1,250 +1,246 @@
 <template>
-  <div class="sidebarMessage" v-if="$route.name === 'text'">
-    <div class="sidebarMessage__header"></div>
-
-    <div class="sidebarMessage__nav">
-      <div class="sidebarMessage__nav__group">
-        <Icon name="search" />
-
-        <input
-          class="sidebarMessage__nav__group__input"
-          type="text"
-          v-model="searchQuery"
-          placeholder="Search or start new chat"
-        />
-      </div>
-    </div>
-
-    <div class="sidebarMessage__users">
-      <div v-if="loadingChats" class="sidebarMessage__users__load">
-        Loading chats...
-      </div>
-
-      <div v-else-if="error" class="sidebarMessage__users__error">
-        {{ error }}
-      </div>
-
-      <div
-        v-else-if="chats && chats.length"
-        class="sidebarMessage__users__list"
-      >
-        <div
-          v-for="chat in filteredChats"
-          :key="chat.chat_id"
-          class="sidebarMessage__users__content"
-          @click="handleSetActiveChat(chat)"
-          :class="{ active: activeChat && activeChat.chat_id === chat.chat_id }"
-        >
-          <div class="sidebarMessage__users__content__avatar">
-            {{ getInitials(chat.display_name) }}
-          </div>
-
-          <div class="sidebarMessage__users__content__group">
-            <div class="sidebarMessage__users__content__group__box">
-              <h3 class="sidebarMessage__users__content__group__box__name">
-                {{ chat.display_name }}
-              </h3>
-
-              <p class="sidebarMessage__users__content__group__box__time">
-                {{ formatDate(chat.latest_message_sent_at) }}
-              </p>
-            </div>
-
-            <p class="sidebarMessage__users__content__group__message">
-              {{ chat.latest_message_text || "No messages yet" }}
-            </p>
-
-            <p class="sidebarMessage__users__content__group__last-seen">
-              {{ getLastSeenStatus(chat) }}
-            </p>
-          </div>
+  <div class="sidebar-message" v-if="$route.name === 'text'">
+    <div
+      class="sidebar-message__container"
+      :class="{ 'sidebar-message__container--blur': isAnyModalOpen }"
+    >
+      <div class="sidebar-message__header"></div>
+      <div class="sidebar-message__nav">
+        <div class="sidebar-message__nav__group">
+          <Icon name="search" />
+          <input
+            class="sidebar-message__nav__group__input"
+            type="text"
+            v-model="searchQuery"
+            placeholder="Search or start new chat"
+          />
         </div>
+        <button @click="openNewChatModal" class="sidebar-message__new-chat-btn">
+          <Icon name="add" />
+        </button>
       </div>
-
-      <div v-else class="sidebarMessage__users__empty">No chats found.</div>
+      <ChatList
+        :chats="filteredChats"
+        :activeChat="activeChat"
+        :loadingChats="loadingChats"
+        :error="error"
+        :currentUser="currentUser"
+        @setActiveChat="handleSetActiveChat"
+        @openDeleteModal="handleOpenDeleteModal"
+      />
     </div>
+
+    <NewChatModal
+      v-if="isNewChatModalOpen"
+      :isGroupChat="isGroupChat"
+      :selectedUsers="selectedUsers"
+      :newGroupName="newGroupName"
+      :allUsers="allUsers"
+      :searchError="searchError"
+      @close="closeNewChatModal"
+      @createChat="createNewChat"
+      @toggleGroupChat="toggleGroupChat"
+      @searchUsers="searchUsers"
+      @selectUser="selectUser"
+      @removeUser="removeUser"
+      @updateNewGroupName="updateNewGroupName"
+    />
+
+    <DeleteChatModal
+      v-if="isDeleteModalOpen"
+      :chatToDelete="chatToDelete"
+      @close="handleCloseDeleteModal"
+      @confirmDelete="confirmDeleteChat"
+    />
   </div>
 </template>
 
 <script>
 import { mapState, mapActions, mapGetters } from "vuex";
-
 import { Icon } from "../icon.jsx";
+import { debounce } from "lodash";
+import axiosInstance from "../services/base/baseURL";
+import ChatList from "./ChatList.vue";
+import NewChatModal from "./NewChatModal.vue";
+import DeleteChatModal from "./DeleteChatModal.vue";
 
 export default {
   name: "SidebarMessage",
-
   components: {
     Icon,
+    ChatList,
+    NewChatModal,
+    DeleteChatModal,
   },
-
   data() {
     return {
       searchQuery: "",
+      userSearchQuery: "",
+      allUsers: [],
+      selectedUsers: [],
+      isGroupChat: false,
+      newGroupName: "",
+      searchError: null,
+      chatToDelete: null,
     };
   },
-
   computed: {
     ...mapState("chats", ["chats", "activeChat", "loadingChats", "error"]),
-
     ...mapState("auth", ["currentUser"]),
-
+    ...mapState("ui", ["isNewChatModalOpen", "isDeleteModalOpen"]),
     ...mapGetters("chats", ["getAllChats"]),
-
     filteredChats() {
       if (!this.chats) return [];
-
-      return this.chats.filter((chat) =>
-        chat.display_name.toLowerCase().includes(this.searchQuery.toLowerCase())
-      );
-    },
-  },
-
-  methods: {
-    ...mapActions("chats", ["fetchChats", "setActiveChat"]),
-
-    ...mapActions("messages", ["fetchMessages"]),
-
-    formatDate(dateString) {
-      if (!dateString) return "";
-
-      const date = new Date(dateString);
-
-      return date.toLocaleTimeString([], {
-        hour: "2-digit",
-
-        minute: "2-digit",
+      return this.chats.filter((chat) => {
+        if (!chat || !chat.display_name) {
+          console.warn("Invalid chat object:", chat);
+          return false;
+        }
+        return chat.display_name
+          .toLowerCase()
+          .includes(this.searchQuery.toLowerCase());
       });
     },
-
-    getInitials(name) {
-      return name
-
-        .split(" ")
-
-        .map((word) => word[0])
-
-        .join("")
-
-        .toUpperCase();
-    },
-
-    async handleSetActiveChat(chat) {
-      console.log("Setting active chat:", chat);
-
-      try {
-        await this.setActiveChat(chat);
-
-        console.log(
-          "Active chat set, fetching messages for chat ID:",
-
-          chat.chat_id
-        );
-
-        await this.fetchMessages(chat.chat_id);
-
-        console.log("Messages fetched successfully");
-      } catch (error) {
-        console.error("Error setting active chat or fetching messages:", error);
-
-        // You might want to show an error message to the user here
-      }
-    },
-
-    getLastSeenStatus(chat) {
-      if (chat.chat_type === "private") {
-        const otherUserId = chat.participants.find(
-          (id) => id !== this.currentUser.id
-        );
-
-        const lastSeen = chat.last_seen_times[otherUserId];
-
-        if (!lastSeen) return "Offline";
-
-        const lastSeenDate = new Date(lastSeen);
-
-        const now = new Date();
-
-        const diffMinutes = Math.floor((now - lastSeenDate) / 60000);
-
-        if (diffMinutes < 1) return "Online";
-
-        if (diffMinutes < 60) return `Last seen ${diffMinutes} minutes ago`;
-
-        if (diffMinutes < 1440)
-          return `Last seen ${Math.floor(diffMinutes / 60)} hours ago`;
-
-        return `Last seen ${Math.floor(diffMinutes / 1440)} days ago`;
-      }
-
-      return ""; // Grup sohbetleri için farklı bir yaklaşım uygulayabilirsiniz
+    isAnyModalOpen() {
+      return this.isNewChatModalOpen || this.isDeleteModalOpen;
     },
   },
+  methods: {
+    ...mapActions("chats", [
+      "fetchChats",
+      "setActiveChat",
+      "createChat",
+      "deleteChat",
+    ]),
+    ...mapActions("messages", ["fetchMessages"]),
+    ...mapActions("ui", [
+      "openNewChatModal",
+      "closeNewChatModal",
+      "openDeleteModal",
+      "closeDeleteModal",
+    ]),
 
+    searchUsers: debounce(async function (query) {
+      this.searchError = null;
+      if (!query.trim()) {
+        this.allUsers = [];
+        return;
+      }
+
+      try {
+        const response = await axiosInstance.get("/users/search", {
+          params: { query: query },
+        });
+
+        if (response.data && Array.isArray(response.data)) {
+          this.allUsers = response.data.map((user) => ({
+            id: user.user_id,
+            name: user.username,
+            email: user.email,
+            profilePicture: user.profile_picture_url,
+            bio: user.bio,
+          }));
+        } else {
+          this.allUsers = [];
+          console.warn(
+            "Unexpected response format from user search API:",
+            response.data
+          );
+        }
+      } catch (error) {
+        console.error("Error searching users:", error);
+        this.searchError = `Kullanıcı araması sırasında bir hata oluştu: ${
+          error.response?.data?.message || error.message
+        }`;
+        this.allUsers = [];
+      }
+    }, 300),
+
+    async handleSetActiveChat(chat) {
+      try {
+        await this.setActiveChat(chat);
+        await this.fetchMessages(chat.chat_id);
+      } catch (error) {
+        console.error("Error setting active chat or fetching messages:", error);
+      }
+    },
+
+    async createNewChat(chatData) {
+      try {
+        const newChat = await this.createChat(chatData);
+        this.closeNewChatModal();
+        this.setActiveChat(newChat);
+        this.$router.push({
+          name: "text",
+          params: { chatId: newChat.chat_id },
+        });
+      } catch (error) {
+        console.error("Yeni sohbet oluşturma hatası:", error);
+        alert("Sohbet oluşturulurken bir hata oluştu.");
+      }
+    },
+
+    selectUser(user) {
+      if (
+        !this.selectedUsers.some((selectedUser) => selectedUser.id === user.id)
+      ) {
+        this.selectedUsers.push(user);
+      }
+      this.userSearchQuery = "";
+      this.allUsers = [];
+    },
+
+    removeUser(user) {
+      this.selectedUsers = this.selectedUsers.filter(
+        (selectedUser) => selectedUser.id !== user.id
+      );
+    },
+
+    toggleGroupChat() {
+      this.isGroupChat = !this.isGroupChat;
+      if (!this.isGroupChat && this.selectedUsers.length > 1) {
+        this.selectedUsers = [this.selectedUsers[0]];
+      }
+      this.newGroupName = "";
+    },
+
+    updateNewGroupName(name) {
+      this.newGroupName = name;
+    },
+
+    handleOpenDeleteModal(chat) {
+      this.chatToDelete = chat;
+      this.openDeleteModal();
+    },
+
+    handleCloseDeleteModal() {
+      this.chatToDelete = null;
+      this.closeDeleteModal();
+    },
+
+    async confirmDeleteChat() {
+      if (this.chatToDelete) {
+        try {
+          await this.deleteChat(this.chatToDelete.chat_id);
+          this.handleCloseDeleteModal();
+        } catch (error) {
+          console.error("Failed to delete chat:", error);
+        }
+      }
+    },
+  },
   created() {
     this.fetchChats();
   },
-
   mounted() {
-    // Belirli aralıklarla sohbetleri güncelle (örneğin her 1 dakikada bir)
-
     this.updateInterval = setInterval(() => {
       this.fetchChats();
-    }, 60000); // 60000 ms = 1 dakika
+    }, 60000);
   },
-
   beforeUnmount() {
-    // Komponent yok edilmeden önce interval'i temizle
-
     clearInterval(this.updateInterval);
   },
 };
 </script>
 
-<style scoped>
-.sidebarMessage__users__content__avatar {
-  width: 40px;
-
-  height: 40px;
-
-  border-radius: 50%;
-
-  background-color: #ccc;
-
-  display: flex;
-
-  justify-content: center;
-
-  align-items: center;
-
-  font-weight: bold;
-}
-
-.sidebarMessage__users__content.active {
-  background-color: #e6e6e6;
-}
-
-.sidebarMessage__users__error {
-  color: red;
-
-  padding: 10px;
-
-  text-align: center;
-}
-
-.sidebarMessage__users__empty {
-  text-align: center;
-
-  padding: 20px;
-
-  color: #888;
-}
-
-.sidebarMessage__users__content__group__last-seen {
-  font-size: 0.8em;
-
-  color: #888;
-
-  margin-top: 5px;
-}
-</style>
+<style scoped></style>

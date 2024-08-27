@@ -1,8 +1,8 @@
 <template>
-  <div class="message-container">
+  <div class="message__container">
     <div v-if="loadingMessages">Loading messages...</div>
     <div v-else-if="error">{{ error }}</div>
-    <div v-else-if="messages.length" class="messages">
+    <div class="message__container__group" v-else-if="messages.length">
       <div v-for="message in sortedMessages" :key="message.message_id">
         <outgoingMessage
           v-if="isCurrentUserMessage(message)"
@@ -11,7 +11,7 @@
         <fromMessage v-else :message="message" />
       </div>
     </div>
-    <div v-else>No messages yet.</div>
+    <div class="noMessage_container" v-else>henüz mesaj başlatılmamış</div>
   </div>
 </template>
 

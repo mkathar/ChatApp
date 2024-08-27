@@ -21,22 +21,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-.outgoingMessage {
-  display: flex;
-  justify-content: flex-end;
-  margin-bottom: 10px;
-}
-.outgoingMessage__group {
-  background-color: #dcf8c6;
-  padding: 10px;
-  border-radius: 10px;
-  max-width: 70%;
-}
-.outgoingMessage__time {
-  font-size: 12px;
-  color: #999;
-  margin-right: 10px;
-}
-</style>

@@ -65,4 +65,16 @@ module.exports = {
     ORDER BY m.sent_at DESC
     LIMIT 1
   `,
+  createChat:
+    "INSERT INTO chats (chat_type, chat_name) VALUES($1, $2) RETURNING *",
+  addParticipant:
+    "INSERT INTO chat_participants (chat_id, user_id) VALUES($1, $2)",
+  getPrivateChat: `
+    SELECT c.chat_id
+    FROM chats c
+    JOIN chat_participants cp1 ON c.chat_id = cp1.chat_id
+    JOIN chat_participants cp2 ON c.chat_id = cp2.chat_id
+    WHERE c.chat_type = 'private'
+    AND cp1.user_id = $1 AND cp2.user_id = $2
+  `,
 };

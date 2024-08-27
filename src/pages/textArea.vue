@@ -1,7 +1,9 @@
 <template>
-  <div>
-    <SidebarMessage />
-    <div class="textArea">
+  <SidebarMessage />
+  <div class="textArea">
+    <div
+      :class="{ 'blur-background': isNewChatModalOpen || isDeleteModalOpen }"
+    >
       <TextHeader />
       <Text />
     </div>
@@ -12,7 +14,6 @@
 import sidebarMessage from "../components/sidebarMessage.vue";
 import { Icon } from "@/icon";
 import textHeader from "../components/textHeader.vue";
-
 import { mapState } from "vuex";
 import text from "../components/text.vue";
 
@@ -30,11 +31,17 @@ export default {
       console.log("Old route path: " + from.path);
     },
   },
-
-  mounted() {},
-
   computed: {
+    ...mapState("ui", ["isNewChatModalOpen", "isDeleteModalOpen"]),
     ...mapState(["textActive"]),
   },
+  mounted() {},
 };
 </script>
+
+<style scoped>
+.blur-background {
+  filter: blur(5px);
+  transition: filter 0.3s ease;
+}
+</style>

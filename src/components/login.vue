@@ -75,7 +75,7 @@ export default {
           user_mail: this.email,
           user_password: this.password,
         });
-        this.$router.push("/text"); // Başarılı girişten sonra yönlendir
+        this.$router.push("/text");
       } catch (error) {
         console.error("Login error", error);
         // Hata zaten Vuex store'da işleniyor, burada ek bir şey yapmaya gerek yok

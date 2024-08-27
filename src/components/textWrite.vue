@@ -39,10 +39,9 @@ export default {
           chatId: this.activeChat.chat_id,
           messageText: this.messageText,
         });
-        this.messageText = ""; // Clear input after sending
+        this.messageText = "";
       } catch (error) {
         console.error("Failed to send message:", error);
-        // Handle error (e.g., show a notification to the user)
       }
     },
   },

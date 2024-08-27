@@ -32,38 +32,68 @@ export default {
     setError(state, error) {
       state.error = error;
     },
+    REMOVE_CHAT(state, chatId) {
+      state.chats = state.chats.filter((chat) => chat.chat_id !== chatId);
+    },
   },
   actions: {
     async fetchChats({ commit }) {
       commit("setLoadingChats", true);
       commit("setError", null);
       try {
+        console.log("Fetching chats...");
         const response = await axiosInstance.get("/user-chats");
+        console.log("Chats fetched successfully:", response.data);
         commit("setChats", response.data);
       } catch (error) {
         console.error("Error fetching chats:", error);
+        console.error("Error response:", error.response);
         commit("setError", "Failed to fetch chats");
       } finally {
         commit("setLoadingChats", false);
       }
     },
-    async createChat({ commit }, { chatType, chatName, participantIds }) {
-      commit("setError", null);
+    async deleteChat({ commit, dispatch }, chatId) {
       try {
-        const response = await axiosInstance.post("/chats", {
-          chatType,
-          chatName,
-          participantIds,
-        });
-        commit("addChat", response.data);
-        return response.data;
+        await axiosInstance.delete(`/chats/${chatId}`);
+        commit("REMOVE_CHAT", chatId);
+        dispatch("setActiveChat", null);
       } catch (error) {
-        console.error("Error creating chat:", error);
-        commit("setError", "Failed to create chat");
+        console.error("Error deleting chat:", error);
         throw error;
       }
     },
-    setActiveChat({ commit, dispatch, rootState }, chat) {
+    async createChat(
+      { commit, dispatch },
+      { participants, chatName, isGroup }
+    ) {
+      try {
+        const response = await axiosInstance.post("/new-chat", {
+          participants,
+          chatName,
+          isGroup,
+        });
+
+        commit("addChat", response.data);
+
+        await dispatch("fetchChats");
+
+        dispatch("setActiveChat", response.data);
+
+        return response.data;
+      } catch (error) {
+        console.error("Error creating new chat:", error);
+        throw error;
+      }
+    },
+    async setActiveChat({ commit, dispatch, rootState, state }, chat) {
+      if (!chat.display_name || !chat.participants) {
+        const fullChat = state.chats.find((c) => c.chat_id === chat.chat_id);
+        if (fullChat) {
+          chat = { ...fullChat };
+        }
+      }
+
       commit("setActiveChat", chat);
       if (rootState.socket) {
         rootState.socket.emit("join chat", chat.chat_id);
@@ -85,7 +115,6 @@ export default {
         throw error;
       }
     },
-    // WebSocket üzerinden gelen sohbet güncellemelerini işleme
     updateChats({ commit }, chats) {
       commit("setChats", chats);
     },

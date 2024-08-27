@@ -61,7 +61,7 @@ export default {
         throw error;
       }
     },
-    // WebSocket üzerinden gelen yeni mesajı ekleme
+
     addSocketMessage({ commit, rootState }, message) {
       if (message.sender_id !== rootState.auth.currentUser.id) {
         commit("addMessage", message);

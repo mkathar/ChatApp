@@ -61,6 +61,4 @@ export default {
 };
 </script>
 
-<style>
-/* Genel stil tanımlamaları buraya eklenebilir */
-</style>
+<style></style>
