@@ -1,29 +1,16 @@
 <template>
   <div class="fromMessage">
-    <div class="fromMessage__box">
-      <p v-if="showSender" class="fromMessage__box__sender">
-        {{ message.sender_name }}
+    <img
+      class="fromMessage__img"
+      src="https://picsum.photos/id/234/40/40"
+      alt=""
+    />
+    <div class="fromMessage__group">
+      <p class="fromMessage__group__text">
+        Lorem, ipsum dolor sit amet consectetur adipisicing elit. Ipsam
+        doloremque quia odio iste veritatis dolores.
       </p>
-      <div class="fromMessage__group">
-        <p class="fromMessage__group__text">{{ message.message_text }}</p>
-      </div>
     </div>
-    <p class="fromMessage__time">{{ formatTime(message.sent_at) }}</p>
+    <p class="fromMessage__time">15:44 am</p>
   </div>
 </template>
-<script>
-export default {
-  props: ["message", "showSender"],
-  methods: {
-    formatTime(dateString) {
-      const date = new Date(dateString);
-      return date.toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-      });
-    },
-  },
-};
-</script>
-
-<style scoped></style>

@@ -1,269 +1,114 @@
 <template>
-  <div class="sidebar-message" v-if="$route.name === 'text'">
-    <div
-      class="sidebar-message__container"
-      :class="{ 'sidebar-message__container--blur': isAnyModalOpen }"
-    >
-      <div class="sidebar-message__header"></div>
-      <div class="sidebar-message__nav">
-        <div class="sidebar-message__nav__group">
-          <Icon name="search" />
-          <input
-            class="sidebar-message__nav__group__input"
-            type="text"
-            v-model="searchQuery"
-            placeholder="Search or start new chat"
-          />
-        </div>
-        <button @click="openNewChatModal" class="sidebar-message__new-chat-btn">
-          <Icon name="add" />
-        </button>
+  <div class="sidebarMessage" v-if="this.$route.name == `text`">
+    <div class="sidebarMessage__header"></div>
+    <div class="sidebarMessage__nav">
+      <div class="sidebarMessage__nav__group">
+        <Icon name="search" />
+        <input class="sidebarMessage__nav__group__input" type="text" />
       </div>
-      <ChatList
-        :chats="filteredChats"
-        :activeChat="activeChat"
-        :loadingChats="loadingChats"
-        :error="error"
-        :currentUser="currentUser"
-        @setActiveChat="handleSetActiveChat"
-        @openDeleteModal="handleOpenDeleteModal"
-      />
     </div>
+    <div class="sidebarMessage__users">
+      <div v-if="!allConversations" class="sidebarMessage__users__load"></div>
 
-    <NewChatModal
-      v-if="isNewChatModalOpen"
-      :isGroupChat="isGroupChat"
-      :selectedUsers="selectedUsers"
-      :newGroupName="newGroupName"
-      :allUsers="allUsers"
-      :searchError="searchError"
-      :existingChatError="existingChatError"
-      @close="closeNewChatModal"
-      @createChat="createNewChat"
-      @toggleGroupChat="toggleGroupChat"
-      @searchUsers="searchUsers"
-      @selectUser="selectUser"
-      @removeUser="removeUser"
-      @updateNewGroupName="updateNewGroupName"
-    />
-    <DeleteChatModal
-      v-if="isDeleteModalOpen"
-      :chatToDelete="chatToDelete"
-      @close="handleCloseDeleteModal"
-      @confirmDelete="confirmDeleteChat"
-    />
+      <div
+        v-if="allConversations"
+        v-for="(message, index) in allConversations"
+        class="sidebarMessage__users__content"
+        :key="index"
+        @click="MessagesForPartner"
+        :id="message.mesajlaşılanKişi_Id"
+      >
+        <img
+          class="sidebarMessage__users__content__img"
+          :src="message.img"
+          alt=""
+        />
+        <div class="sidebarMessage__users__content__group">
+          <div class="sidebarMessage__users__content__group__box">
+            <h3
+              v-text="message.mesajlaşılanKişi"
+              class="sidebarMessage__users__content__group__box__name"
+            ></h3>
+            <p
+              v-text="message.message_time"
+              class="sidebarMessage__users__content__group__box__time"
+            ></p>
+          </div>
+          <p
+            v-text="message.Mesajlar[0].message_text"
+            class="sidebarMessage__users__content__group__message"
+          ></p>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
-
 <script>
-import { mapState, mapActions, mapGetters } from "vuex";
+import { io } from "socket.io-client";
 import { Icon } from "../icon.jsx";
-import { debounce } from "lodash";
-import axiosInstance from "../services/base/baseURL";
-import ChatList from "./ChatList.vue";
-import NewChatModal from "./NewChatModal.vue";
-import DeleteChatModal from "./DeleteChatModal.vue";
+import axios from "axios";
+import axiosInstance from "../services/base/baseURL.js";
+import { mapState } from "vuex";
 
 export default {
-  name: "SidebarMessage",
-  components: {
-    Icon,
-    ChatList,
-    NewChatModal,
-    DeleteChatModal,
-  },
   data() {
     return {
-      searchQuery: "",
-      userSearchQuery: "",
-      allUsers: [],
-      selectedUsers: [],
-      isGroupChat: false,
-      newGroupName: "",
-      searchError: null,
-      chatToDelete: null,
-      existingChatError: null,
+      messages: [],
+      wait: true,
     };
   },
-  computed: {
-    ...mapState("chats", ["chats", "activeChat", "loadingChats", "error"]),
-    ...mapState("auth", ["currentUser"]),
-    ...mapState("ui", ["isNewChatModalOpen", "isDeleteModalOpen"]),
-    ...mapGetters("chats", ["getAllChats"]),
-    filteredChats() {
-      if (!this.chats) return [];
-      return this.chats.filter((chat) => {
-        if (!chat || !chat.display_name) {
-          console.warn("Invalid chat object:", chat);
-          return false;
-        }
-        return chat.display_name
-          .toLowerCase()
-          .includes(this.searchQuery.toLowerCase());
-      });
-    },
-    isAnyModalOpen() {
-      return this.isNewChatModalOpen || this.isDeleteModalOpen;
-    },
+  components: {
+    Icon,
   },
   methods: {
-    ...mapActions("chats", [
-      "fetchChats",
-      "setActiveChat",
-      "createChat",
-      "deleteChat",
-    ]),
-    ...mapActions("messages", ["fetchMessages"]),
-    ...mapActions("ui", [
-      "openNewChatModal",
-      "closeNewChatModal",
-      "openDeleteModal",
-      "closeDeleteModal",
-    ]),
-
-    searchUsers: debounce(async function (query) {
-      this.searchError = null;
-      if (!query.trim()) {
-        this.allUsers = [];
-        return;
-      }
-
-      try {
-        const response = await axiosInstance.get("/users/search", {
-          params: { query: query },
+    MessagesForPartner(e) {
+      console.log(e.targetid);
+      const partner_id = e.target.id;
+      this.showMessage();
+      console.log(partner_id);
+      this.$store.dispatch("getMessagesForPartner", partner_id);
+    },
+    updateVariable(e) {
+      const newValue = e.target.id;
+      this.$store
+        .dispatch("updateVariable", newValue)
+        .then((response) => {
+          // Başarılı yanıt
+          console.log(response.data);
+        })
+        .catch((error) => {
+          // Hata durumu
+          console.error("İşlem hatası:", error);
         });
+    },
 
-        if (response.data && Array.isArray(response.data)) {
-          this.allUsers = response.data.map((user) => ({
-            id: user.user_id,
-            name: user.username,
-            email: user.email,
-            profilePicture: user.profile_picture_url,
-            bio: user.bio,
-          }));
-        } else {
-          this.allUsers = [];
-          console.warn(
-            "Unexpected response format from user search API:",
-            response.data
-          );
-        }
-      } catch (error) {
-        console.error("Error searching users:", error);
-        this.searchError = `Kullanıcı araması sırasında bir hata oluştu: ${
-          error.response?.data?.message || error.message
-        }`;
-        this.allUsers = [];
-      }
-    }, 300),
-
-    async handleSetActiveChat(chat) {
+    showMessage() {
+      const textisActive = true;
+      this.$store.commit("showText", textisActive);
+    },
+    async checkSession() {
       try {
-        await this.setActiveChat(chat);
-        await this.fetchMessages(chat.chat_id);
+        const response = await axiosInstance.get("/oturum-durumu");
+        this.isLoggedIn = response.data.isLoggedIn;
+        console.log("oturum açık");
       } catch (error) {
-        console.error("Error setting active chat or fetching messages:", error);
-      }
-    },
-
-    async createNewChat(chatData) {
-      try {
-        this.existingChatError = null;
-        if (!chatData.isGroup) {
-          const existingChat = this.chats.find(
-            (chat) =>
-              chat.chat_type === "private" &&
-              chat.participants.includes(chatData.participants[0]) &&
-              chat.participants.includes(this.currentUser.id)
-          );
-
-          if (existingChat) {
-            this.existingChatError =
-              "Bu kullanıcı ile zaten bir sohbetiniz var. Sohbete Yönlendiriliyorsun";
-            setTimeout(() => {
-              this.closeNewChatModal();
-              this.setActiveChat(existingChat);
-              this.$router.push({
-                name: "text",
-                params: { chatId: existingChat.chat_id },
-              });
-            }, 2000);
-            return;
-          }
-        }
-
-        const newChat = await this.createChat(chatData);
-        this.closeNewChatModal();
-        this.setActiveChat(newChat);
-        this.$router.push({
-          name: "text",
-          params: { chatId: newChat.chat_id },
-        });
-      } catch (error) {
-        console.error("Yeni sohbet oluşturma hatası:", error);
-        this.existingChatError = "Sohbet oluşturulurken bir hata oluştu.";
-      }
-    },
-
-    selectUser(user) {
-      if (
-        !this.selectedUsers.some((selectedUser) => selectedUser.id === user.id)
-      ) {
-        this.selectedUsers.push(user);
-      }
-      this.userSearchQuery = "";
-      this.allUsers = [];
-    },
-
-    removeUser(user) {
-      this.selectedUsers = this.selectedUsers.filter(
-        (selectedUser) => selectedUser.id !== user.id
-      );
-    },
-
-    toggleGroupChat() {
-      this.isGroupChat = !this.isGroupChat;
-      if (!this.isGroupChat && this.selectedUsers.length > 1) {
-        this.selectedUsers = [this.selectedUsers[0]];
-      }
-      this.newGroupName = "";
-    },
-
-    updateNewGroupName(name) {
-      this.newGroupName = name;
-    },
-
-    handleOpenDeleteModal(chat) {
-      this.chatToDelete = chat;
-      this.openDeleteModal();
-    },
-
-    handleCloseDeleteModal() {
-      this.chatToDelete = null;
-      this.closeDeleteModal();
-    },
-
-    async confirmDeleteChat() {
-      if (this.chatToDelete) {
-        try {
-          await this.deleteChat(this.chatToDelete.chat_id);
-          this.handleCloseDeleteModal();
-        } catch (error) {
-          console.error("Failed to delete chat:", error);
-        }
+        console.error(error);
+        this.isLoggedIn = false;
       }
     },
   },
   created() {
-    this.fetchChats();
+    this.checkSession();
   },
-  mounted() {
-    this.updateInterval = setInterval(() => {
-      this.fetchChats();
-    }, 60000);
+  computed: {
+    ...mapState({
+      currentUser: (state) => state.currentUser,
+      allConversations: (state) => state.allConversations,
+      conversationPartners: (state) => state.conversationPartners,
+      conversationMessages: (state) => state.conversationMessages,
+      textActive: (state) => state.textActive,
+    }),
   },
-  beforeUnmount() {
-    clearInterval(this.updateInterval);
-  },
+  mounted() {},
 };
 </script>

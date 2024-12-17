@@ -1,27 +1,13 @@
 <template>
   <div class="outgoingMessage">
-    <p class="outgoingMessage__time">{{ formatTime(message.sent_at) }}</p>
-    <div class="outgoingMessage__box">
-      <p v-if="showSender" class="outgoingMessage__box__sender">
-        {{ message.sender_name }}
-      </p>
-      <div class="outgoingMessage__group">
-        <p class="outgoingMessage__group__text">{{ message.message_text }}</p>
-      </div>
+    <p class="outgoingMessage__time">15:44 am</p>
+    <div class="outgoingMessage__group">
+      <p class="outgoingMessage__group__text">Lorem ipsum dolor sit amet.</p>
     </div>
+    <img
+      class="outgoingMessage__img"
+      src="https://picsum.photos/id/231/40/40"
+      alt=""
+    />
   </div>
 </template>
-<script>
-export default {
-  props: ["message", "showSender"],
-  methods: {
-    formatTime(dateString) {
-      const date = new Date(dateString);
-      return date.toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-      });
-    },
-  },
-};
-</script>
