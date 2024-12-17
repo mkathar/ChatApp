@@ -1,99 +1,98 @@
 # ChatApp (WhatsApp Clone)
 
-Bu proje, gerçek zamanlı bir sohbet uygulamasıdır ve WhatsApp'ı temel alarak geliştirilmiştir. Kullanıcıların anlık mesajlaşmasını, çevrimiçi durumlarını takip etmesini ve diğer temel özellikleri sunar.
+This project is a real-time chat application inspired by WhatsApp. It allows users to send instant messages, track online statuses, and offers other essential features.
 
-**Başlangıç Tarihi:** Ekim 2023
+**Start Date:** October 2023  
+**End Date:** Still in Development
 
-**Bitiş Tarihi:** Hala Geliştirilme Aşamasında
-
-## Kullanılan Teknolojiler
+## Technologies Used
 
 - **Frontend:**
   - Vue.js 3
   - Vuex (state management)
   - Vue Router (navigation)
   - SCSS (styling)
-  - BEM methodology (CSS yapılandırması)
-  - Swiper (kaydırma efektleri için)
-  - axios (API istekleri)
+  - BEM methodology (CSS structuring)
+  - Swiper (for slider effects)
+  - axios (for API requests)
 - **Backend:**
   - Node.js
   - Express.js
-  - PostgreSQL (Veritabanı)
-  - pg-promise (Veritabanı işlemleri için)
-  - Socket.IO (Gerçek zamanlı mesajlaşma)
-  - JWT (Kimlik doğrulama için)
-  - bcrypt (Şifreleme için)
+  - PostgreSQL (Database)
+  - pg-promise (for database operations)
+  - Socket.IO (real-time messaging)
+  - JWT (for authentication)
+  - bcrypt (for password encryption)
 
-## Temel Özellikler
+## Key Features
 
-- **Kullanıcı Kayıt ve Kimlik Doğrulama:** Güvenli kullanıcı kaydı ve kimlik doğrulama JWT ve bcrypt kullanılarak sağlanır.
-- **Gerçek Zamanlı Mesajlaşma:** Socket.IO ile anlık mesajlaşma özelliği.
-- **Çevrimiçi Kullanıcı Durumu Takibi:** Kullanıcıların çevrimiçi/çevrimdışı durumlarını takip edebilme özelliği.
-- **Kullanıcı ve Mesaj Arama:** Kullanıcıları ve mesajları arama özelliği.
-- **Kullanıcı Profil Yönetimi:** Kullanıcıların profillerini yönetebilme özelliği.
-- **Duyarlı Tasarım:** Farklı cihazlarda sorunsuz kullanım için duyarlı bir kullanıcı arayüzü.
+- **User Registration and Authentication:** Secure user registration and authentication using JWT and bcrypt.
+- **Real-Time Messaging:** Instant messaging powered by Socket.IO.
+- **Online Status Tracking:** Ability to monitor users' online/offline statuses.
+- **Search Functionality:** Search for users and messages.
+- **User Profile Management:** Manage user profiles with ease.
+- **Responsive Design:** A responsive user interface for seamless use across different devices.
 
-## Güvenlik Önlemleri
+## Security Measures
 
-- **CORS İlkeleri:** Güvenli oturum yönetimi için CORS ilkeleri kullanılmıştır.
-- **HTTP-only Çerezler:** Oturum yönetimi için HTTP-only çerezler kullanılarak XSS ve CSRF saldırılarına karşı koruma sağlanır.
+- **CORS Policies:** CORS policies implemented for secure session management.
+- **HTTP-only Cookies:** HTTP-only cookies used for session management, providing protection against XSS and CSRF attacks.
 
-## Proje Yönetimi
+## Project Management
 
-- **Trello:** Projenin etkin yönetimi ve sürekli gelişim için Trello kullanılmıştır.
+- **Trello:** Trello was used for effective project management and continuous development.
 
-## Kurulum
+## Setup
 
-1.  **Depoyu Klonlayın:**
+1.  **Clone the Repository:**
 
     ```bash
     git clone https://github.com/mkathar/ChatApp.git
     ```
 
-2.  **Proje Dizinine Girin:**
+2.  **Navigate to the Project Directory:**
 
     ```bash
     cd ChatApp
     ```
 
-3.  **Bağımlılıkları Yükleyin:**
+3.  **Install Dependencies:**
 
     ```bash
     npm install
     ```
 
-4.  **Veritabanı Ayarlarını Yapın:**
+4.  **Configure the Database:**
 
-    - PostgreSQL veritabanını kurun ve bir veritabanı oluşturun.
-    - `.env` dosyası içerisinde veritabanı bilgilerinizi tanımlayın.
-      - Örn:
+    - Set up a PostgreSQL database and create a new database.
+    - Define your database credentials in the `.env` file.
+      - Example:
         - PORT=3000
-        - DB_USER="kullanici_adi"
-        - DB_PASSWORD="parola"
-        - DB_NAME="veritabanı_adı"
+        - DB_USER="username"
+        - DB_PASSWORD="password"
+        - DB_NAME="database_name"
         - DB_HOST=localhost
         - DB_PORT=5432
 
-5.  **Sunucuyu Başlatın:**
+5.  **Start the Server:**
 
     ```bash
-    npm run server
+    npm start
     ```
 
-6.  **Frontend'i Başlatın:**
+6.  **Start the Frontend:**
 
     ```bash
-        npm run dev
+    npm run dev
     ```
 
-## Kullanım
+## Usage
 
-1.  Uygulamayı tarayıcınızda açın (port bilgisi değişebilir, genellikle 8080 veya farklı bir portta çalışır).
-2.  Kayıtlı bir kullanıcı ile giriş yapın (veya yeni bir kullanıcı kaydedin).
-3.  Sohbet etmeye başlayın!
+1.  Open the application in your browser (the default port is usually 8080 or another available port).
+2.  Log in with an existing user account (or register a new account).
+3.  Start chatting!
 
-## Proje Yapısı
+## Project Structure
 
 <pre>
 ChatApp/
@@ -173,31 +172,29 @@ ChatApp/
 └── package.json
 </pre>
 
-└── package.json
+- `assets`: CSS (SCSS) files and images.
+- `components`: Vue.js components.
+- `pages`: Vue.js pages.
+- `router`: Vue Router configurations.
+- `services`: API services.
+- `database`: Database-related files.
+- `store`: Vuex state management files.
 
-- `assets`: CSS (SCSS) dosyaları ve resimler.
-- `components`: Vue.js bileşenleri.
-- `pages`: Vue.js sayfaları.
-- `router`: Vue Router yapılandırması.
-- `services`: API servisleri.
-- `database`: Veritabanı ile ilgili dosyalar.
-- `store`: Vuex ile state management dosyaları.
+## Contributing
 
-## Katkıda Bulunma
-
-Bu projeye katkıda bulunmak isterseniz, aşağıdaki adımları takip edebilirsiniz:
+If you want to contribute to this project, follow these steps:
 
 1.  **Fork** the repository.
-2.  **Branch** oluşturun (`git checkout -b feature/my-new-feature`).
-3.  **Değişikliklerinizi yapın.**
-4.  **Commit** the changes (`git commit -m 'Add some feature'`).
+2.  **Create a Branch** (`git checkout -b feature/my-new-feature`).
+3.  **Make Your Changes.**
+4.  **Commit** your changes (`git commit -m 'Add some feature'`).
 5.  **Push** to the branch (`git push origin feature/my-new-feature`).
-6.  **Pull request** oluşturun.
+6.  Create a **Pull Request**.
 
-## Lisans
+## License
 
-Bu proje MIT lisansı altında yayınlanmıştır.
+This project is licensed under the MIT License.
 
-## İletişim
+## Contact
 
-Herhangi bir sorunuz veya öneriniz varsa, [e-posta adresinizi] üzerinden bana ulaşabilirsiniz.
+[LinkedIn](https://www.linkedin.com/in/muhammed-mustafa-katar-62a666245/)
