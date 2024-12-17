@@ -95,45 +95,84 @@ Bu proje, gerçek zamanlı bir sohbet uygulamasıdır ve WhatsApp'ı temel alara
 
 ## Proje Yapısı
 
+<pre>
 ChatApp/
 ├── assets/
-│ └── scss/
-| ├── base/
-| ├── components/
-| └── pages/
+│   └── scss/
+│       ├── base/
+│       │   └── _reset.scss
+│       ├── components/
+│       │   ├── _chat-list.scss
+│       │   ├── _contact.scss
+│       │   ├── _hi.scss
+│       │   ├── _index.scss
+│       │   ├── _login.scss
+│       │   ├── _newChatModal.scss
+│       │   ├── _ourGallery.scss
+│       │   ├── _ourWork.scss
+│       │   ├── _sidebar-Message.scss
+│       │   ├── _sidebar.scss
+│       │   ├── _signIn.scss
+│       │   ├── _text-FromMessage.scss
+│       │   ├── _text-outgoingMessage.scss
+│       │   ├── _textHeader.scss
+│       │   └── _textNav.scss
+│       └── pages/
+│           ├── _textArea.scss
+│           └── _welcome.scss
 ├── components/
-│ ├── chatList.vue
-│ ├── contact.vue
-│ ├── ...
+│   ├── chatList.vue
+│   ├── contact.vue
+│   ├── conversationList.vue
+│   ├── deleteChatModal.vue
+│   ├── fromMessage.vue
+│   ├── hi.vue
+│   ├── login.vue
+│   ├── message.vue
+│   ├── messageList.vue
+│   ├── newChatModal.vue
+│   ├── ourGallery.vue
+│   ├── ourWork.vue
+│   ├── outgoingMessage.vue
+│   ├── sidebar.vue
+│   ├── sidebarMessage.vue
+│   ├── signIn.vue
+│   ├── text.vue
+│   ├── textHeader.vue
+│   ├── textNav.vue
+│   └── textWrite.vue
 ├── pages/
-│ ├── process.vue
-│ ├── textArea.vue
-│ └── welcome.vue
+│   ├── process.vue
+│   ├── textArea.vue
+│   └── welcome.vue
 ├── router/
-│ └── index.js
+│   └── index.js
 ├── services/
-│ └── base/
-│ └── baseURL.js
+│   └── base/
+│       └── baseURL.js
 ├── database/
-│ ├── controllers/
-│ ├── chatController.js
-│ ├── messageController.js
-│ └── userController.js
-| ├── queries/
-| ├── chatQueries.js
-| ├── messageQueries.js
-| └── userQueries.js
-│ ├── config.js
-│ ├── db.js
-│ └── dbOperations.js
+│   ├── controllers/
+│   │   ├── chatController.js
+│   │   ├── messageController.js
+│   │   └── userController.js
+│   ├── queries/
+│   │   ├── chatQueries.js
+│   │   ├── messageQueries.js
+│   │   └── userQueries.js
+│   ├── config.js
+│   ├── db.js
+│   └── dbOperations.js
 ├── store/
-│ └── modules/
-│ ├── auth.js
-│ ├── chats.js
-│ ├── messages.js
-│ └── ui.js
+│   └── modules/
+│       ├── auth.js
+│       ├── chats.js
+│       ├── messages.js
+│       └── ui.js
 ├── App.vue
 ├── main.js
+└── package.json
+</pre>
+
 └── package.json
 
 - `assets`: CSS (SCSS) dosyaları ve resimler.
