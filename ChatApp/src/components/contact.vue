@@ -26,17 +26,17 @@
           dui nisl, mattis ut rhoncus et, cursus ut diam.
         </p>
         <div class="contact__content__communication__tel">
-          <Icon name="bell" />
+          <Icon name="phone" />
           <p>Tel:</p>
           <a href="">010-020-0340</a>
         </div>
         <div class="contact__content__communication__mail">
-          <Icon name="bell" />
+          <Icon name="mail" />
           <p>Email:</p>
           <a href="">info@domain.com</a>
         </div>
         <div class="contact__content__communication__web">
-          <Icon name="bell" />
+          <Icon name="web" />
           <p>Web:</p>
           <a href="">www.domain.com</a>
         </div>

@@ -66,6 +66,9 @@
     &__communication {
       width: 30%;
       color: white;
+      display: flex;
+      flex-direction: column;
+      row-gap: 1rem;
       &__tel {
         column-gap: 10px;
         display: flex;
