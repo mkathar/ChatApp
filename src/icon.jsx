@@ -997,12 +997,9 @@ const Icon = ({ name, size = 24 }) => {
     send: sendIcon,
     home: homeIcon,
     logout: logoutIcon,
-<<<<<<< Updated upstream:ChatApp/src/icon.jsx
-=======
     trash: trashIcon,
     mail: mailIcon,
     web: webIcon,
->>>>>>> Stashed changes:src/icon.jsx
   };
   const Components = icons[name];
   return <Components size={size} />;
