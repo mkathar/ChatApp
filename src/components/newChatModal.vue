@@ -1,276 +1,244 @@
 <template>
-  <div class="new-chat-modal">
-    <div class="new-chat-modal__content">
-      <h3 class="new-chat-modal__title">
-        {{ isGroupChat ? "Yeni Grup Oluştur" : "Yeni Sohbet Başlat" }}
+  <div class="modal">
+    <div class="modal-content">
+      <h3>
+        {{ selectedUsers.length > 1 ? "Yeni Grup Sohbeti" : "Yeni Sohbet" }}
       </h3>
 
-      <!-- Hata mesajı alanı -->
-      <div v-if="existingChatError" class="new-chat-modal__error">
-        {{ existingChatError }}
-      </div>
-
-      <div class="new-chat-modal__search">
+      <div class="search-section">
         <input
           v-model="localUserSearchQuery"
-          @input="$emit('searchUsers', localUserSearchQuery)"
-          placeholder="Kullanıcı ara"
-          class="new-chat-modal__search-input"
+          @input="onSearchUsers"
+          placeholder="Kullanıcı ara..."
+          class="search-input"
         />
-        <div v-if="searchError" class="new-chat-modal__error">
-          {{ searchError }}
-        </div>
 
-        <ul v-if="allUsers.length > 0" class="new-chat-modal__results">
-          <li
-            v-for="user in allUsers"
-            :key="user.id"
-            @click="$emit('selectUser', user)"
-            class="new-chat-modal__result-item"
+        <div v-if="searchResults.length > 0" class="search-results">
+          <div
+            v-for="user in searchResults"
+            :key="user.user_id"
+            @click="selectUser(user)"
+            class="search-result-item"
           >
-            {{ user.name }} ({{ user.email }})
-          </li>
-        </ul>
-        <div
-          v-else-if="localUserSearchQuery && !searchError"
-          class="new-chat-modal__no-results"
-        >
-          Kullanıcı bulunamadı
+            {{ user.user_name }} ({{ user.user_email }})
+          </div>
         </div>
       </div>
 
-      <div class="new-chat-modal__selected">
-        <h4 class="new-chat-modal__subtitle">Seçilen Kullanıcılar:</h4>
-        <ul class="new-chat-modal__selected-list">
-          <li
+      <div v-if="selectedUsers.length > 0" class="selected-users">
+        <h4>Seçili Kullanıcılar:</h4>
+        <div class="selected-user-list">
+          <div
             v-for="user in selectedUsers"
-            :key="user.id"
-            class="new-chat-modal__selected-item"
+            :key="user.user_id"
+            class="selected-user-item"
           >
-            {{ user.name }}
-            <button
-              @click="$emit('removeUser', user)"
-              class="new-chat-modal__remove-btn"
-            >
-              X
-            </button>
-          </li>
-        </ul>
+            {{ user.user_name }}
+            <span @click="removeUser(user)" class="remove-user">×</span>
+          </div>
+        </div>
       </div>
 
-      <div class="new-chat-modal__type">
-        <button
-          @click="$emit('toggleGroupChat')"
-          class="new-chat-modal__toggle-btn"
-        >
-          {{ isGroupChat ? "Özel Sohbet" : "Grup Sohbeti" }}
-        </button>
+      <div v-if="selectedUsers.length > 1" class="group-name-section">
+        <input
+          v-model="groupName"
+          placeholder="Grup ismi girin"
+          class="group-name-input"
+        />
       </div>
 
-      <input
-        v-if="isGroupChat"
-        v-model="localNewGroupName"
-        placeholder="Grup adı"
-        @input="$emit('update:newGroupName', localNewGroupName)"
-        class="new-chat-modal__group-name-input"
-      />
-
-      <div class="new-chat-modal__actions">
+      <div class="modal-actions">
         <button
-          @click="
-            $emit('createChat', {
-              participants: selectedUsers.map((user) => user.id),
-              chatName: isGroupChat ? localNewGroupName : null,
-              isGroup: isGroupChat,
-            })
-          "
-          :disabled="!canCreateChat || existingChatError"
-          class="new-chat-modal__create-btn"
+          @click="createChat"
+          :disabled="!canCreateChat"
+          class="create-button"
         >
-          Oluştur
+          {{ selectedUsers.length > 1 ? "Grup Oluştur" : "Sohbet Başlat" }}
         </button>
-        <button @click="$emit('close')" class="new-chat-modal__cancel-btn">
-          İptal
-        </button>
+        <button @click="$emit('close')" class="cancel-button">İptal</button>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import { mapGetters } from "vuex";
+import { chatService } from "../services/api/chat";
+
 export default {
   name: "NewChatModal",
-  props: {
-    isGroupChat: {
-      type: Boolean,
-      required: true,
-    },
-    selectedUsers: {
-      type: Array,
-      required: true,
-    },
-    newGroupName: {
-      type: String,
-      default: "",
-    },
-    allUsers: {
-      type: Array,
-      required: true,
-    },
-    searchError: {
-      type: String,
-      default: null,
-    },
-    existingChatError: {
-      type: String,
-      default: null,
-    },
-  },
   data() {
     return {
       localUserSearchQuery: "",
-      localNewGroupName: this.newGroupName,
+      selectedUsers: [],
+      groupName: "",
     };
   },
   computed: {
-    canCreateChat() {
-      if (this.isGroupChat) {
-        return (
-          this.selectedUsers.length > 1 && this.localNewGroupName.trim() !== ""
-        );
-      } else {
-        return this.selectedUsers.length === 1;
-      }
+    ...mapGetters(["getSearchResults"]),
+    searchResults() {
+      return this.getSearchResults;
     },
-  },
-  watch: {
-    newGroupName(newValue) {
-      this.localNewGroupName = newValue;
+    canCreateChat() {
+      if (this.selectedUsers.length > 1) {
+        return this.selectedUsers.length >= 2 && this.groupName.trim() !== "";
+      }
+      return this.selectedUsers.length === 1;
     },
   },
   methods: {
-    resetForm() {
-      this.localUserSearchQuery = "";
-      this.localNewGroupName = "";
+    async onSearchUsers() {
+      if (this.localUserSearchQuery.length >= 2) {
+        await this.$store.dispatch("searchUsers", this.localUserSearchQuery);
+      }
+    },
+    selectUser(user) {
+      if (!this.selectedUsers.some((u) => u.user_id === user.user_id)) {
+        this.selectedUsers.push(user);
+      }
+    },
+    removeUser(user) {
+      this.selectedUsers = this.selectedUsers.filter(
+        (u) => u.user_id !== user.user_id
+      );
+      if (this.selectedUsers.length <= 1) {
+        this.groupName = "";
+      }
+    },
+    async createChat() {
+      if (!this.canCreateChat) {
+        console.log("Oluşturma kontrolü başarısız:", {
+          selectedUsers: this.selectedUsers.length,
+          hasGroupName: this.groupName.trim() !== "",
+        });
+        return;
+      }
+
+      try {
+        const chatData = {
+          chat_type: this.selectedUsers.length > 1 ? "group" : "private",
+          chat_name: this.selectedUsers.length > 1 ? this.groupName : null,
+          participants: this.selectedUsers.map((user) => user.user_id),
+        };
+
+        console.log("Sohbet oluşturma isteği:", chatData);
+        const response = await chatService.createChat(chatData);
+        console.log("Sohbet oluşturuldu:", response.data);
+
+        await this.$store.dispatch("fetchChats");
+
+        this.$emit("close");
+      } catch (error) {
+        console.error(
+          "Sohbet oluşturma hatası:",
+          error.response?.data || error
+        );
+      }
     },
   },
 };
 </script>
 
 <style scoped>
-.new-chat-modal {
+.modal {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
 }
 
-.new-chat-modal__content {
-  background-color: white;
+.modal-content {
+  background: white;
   padding: 20px;
   border-radius: 8px;
   width: 90%;
-  max-width: 400px;
+  max-width: 500px;
 }
 
-.new-chat-modal__title {
-  margin-bottom: 20px;
-  text-align: center;
-}
-
-.new-chat-modal__search-input,
-.new-chat-modal__group-name-input {
+.search-input {
   width: 100%;
-  padding: 10px;
+  padding: 8px;
   margin-bottom: 10px;
   border: 1px solid #ddd;
   border-radius: 4px;
 }
 
-.new-chat-modal__error,
-.new-chat-modal__no-results {
-  color: red;
-  margin-bottom: 10px;
-}
-
-.new-chat-modal__results {
-  list-style-type: none;
-  padding: 0;
+.search-results {
   max-height: 200px;
   overflow-y: auto;
+  border: 1px solid #eee;
+  border-radius: 4px;
+}
+
+.search-result-item {
+  padding: 8px;
+  cursor: pointer;
+  border-bottom: 1px solid #eee;
+}
+
+.search-result-item:hover {
+  background: #f5f5f5;
+}
+
+.selected-users {
+  margin: 15px 0;
+}
+
+.selected-user-item {
+  display: inline-flex;
+  align-items: center;
+  background: #6c5ce7;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 15px;
+  margin: 3px;
+}
+
+.remove-user {
+  margin-left: 5px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.group-name-input {
+  width: 100%;
+  padding: 8px;
+  margin: 10px 0;
   border: 1px solid #ddd;
   border-radius: 4px;
 }
 
-.new-chat-modal__result-item {
-  padding: 10px;
-  cursor: pointer;
-}
-
-.new-chat-modal__result-item:hover {
-  background-color: #f0f0f0;
-}
-
-.new-chat-modal__selected-list {
-  list-style-type: none;
-  padding: 0;
-}
-
-.new-chat-modal__selected-item {
+.modal-actions {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 5px;
-  background-color: #f0f0f0;
-  margin-bottom: 5px;
-  border-radius: 4px;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
 }
 
-.new-chat-modal__remove-btn,
-.new-chat-modal__toggle-btn,
-.new-chat-modal__create-btn,
-.new-chat-modal__cancel-btn {
-  padding: 5px 10px;
-  margin: 5px;
+.create-button {
+  background: #6c5ce7;
+  color: white;
   border: none;
+  padding: 8px 16px;
   border-radius: 4px;
   cursor: pointer;
 }
 
-.new-chat-modal__remove-btn {
-  background-color: #ff4444;
-  color: white;
-}
-
-.new-chat-modal__toggle-btn {
-  background-color: #4caf50;
-  color: white;
-}
-
-.new-chat-modal__create-btn {
-  background-color: #2196f3;
-  color: white;
-}
-
-.new-chat-modal__create-btn:disabled {
-  background-color: #b0b0b0;
+.create-button:disabled {
+  background: #a8a4d3;
   cursor: not-allowed;
 }
 
-.new-chat-modal__cancel-btn {
-  background-color: #f44336;
-  color: white;
-}
-
-.new-chat-modal__actions {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 20px;
+.cancel-button {
+  background: #f0f0f0;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
 }
 </style>

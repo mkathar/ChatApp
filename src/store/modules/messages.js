@@ -32,7 +32,9 @@ export default {
       commit("setLoadingMessages", true);
       commit("setError", null);
       try {
-        const response = await axiosInstance.get(`/messages/${chatId}`);
+        const response = await axiosInstance.get(
+          `/conversations/${chatId}/messages`
+        );
         console.log("Messages received:", response.data);
         commit("setMessages", response.data);
       } catch (error) {
@@ -51,12 +53,13 @@ export default {
 
         const messageWithSender = {
           ...response.data,
-          sender_name: rootState.auth.currentUser.name,
+          sender_name:
+            rootState.auth.currentUser?.user_name || "Bilinmeyen Kullanıcı",
         };
 
         commit("addMessage", messageWithSender);
 
-        if (rootState.socket) {
+        if (rootState.socket?.emit) {
           rootState.socket.emit("new message", messageWithSender);
         }
 
@@ -67,10 +70,8 @@ export default {
       }
     },
     addSocketMessage({ commit, rootState }, message) {
-      if (message.sender_id !== rootState.auth.currentUser.id) {
+      if (message.sender_id !== rootState.auth.currentUser?.id) {
         if (!message.sender_name) {
-          // Eğer gönderen adı yoksa, bir şekilde bulmamız gerekiyor
-          // Bu, chat katılımcıları bilgisinden veya ayrı bir API çağrısı ile yapılabilir
           message.sender_name = "Bilinmeyen Kullanıcı";
         }
         commit("addMessage", message);

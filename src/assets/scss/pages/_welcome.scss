@@ -1,7 +1,60 @@
 .welcome {
   display: flex;
-  flex-direction: column;
   font-family: "Open Sans", sans-serif;
+  height: 100vh;
+  overflow: hidden;
+
+  &__sections {
+    flex: 1;
+    height: 100vh;
+    overflow-y: scroll;
+    scroll-behavior: smooth;
+    scroll-snap-type: y mandatory;
+
+    // Scroll çubuğunu gizle ama işlevselliği kalsın
+    &::-webkit-scrollbar {
+      display: none;
+    }
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  &__section {
+    height: 100vh;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+    transition: all 0.5s ease;
+
+    // Fade animasyonu için
+    opacity: 0;
+    transform: translateY(20px);
+    &.active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    will-change: transform, opacity;
+  }
+
+  .fade-enter-active,
+  .fade-leave-active {
+    transition: all 0.5s ease;
+  }
+
+  .fade-enter-from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+
+  .fade-leave-to {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+
+  .fade-enter-to,
+  .fade-leave-from {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 @import "../components/index";

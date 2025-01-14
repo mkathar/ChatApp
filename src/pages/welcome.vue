@@ -1,31 +1,42 @@
 <template>
   <div class="welcome">
-    <Hi />
     <Sidebar />
-    <OurWork />
-    <OurGallery />
-    <Contact />
+    <transition name="fade" mode="out-in">
+      <component
+        :is="currentSection"
+        :key="activeSection"
+        class="welcome__section"
+        :class="{ active: true }"
+      />
+    </transition>
   </div>
 </template>
 
 <script>
-import hi from "../components/hi.vue";
-import sidebar from "../components/sidebar.vue";
-import ourWork from "../components/ourWork.vue";
-import ourGallery from "../components/ourGallery.vue";
+import { mapState } from "vuex";
+import Hi from "../components/hi.vue";
+import OurWork from "../components/ourWork.vue";
+import OurGallery from "../components/ourGallery.vue";
+import Contact from "../components/contact.vue";
+import Sidebar from "../components/sidebar.vue";
 
-import contact from "../components/contact.vue";
 export default {
-  name: "Home",
-  data() {
-    return {};
-  },
   components: {
-    Hi: hi,
-    Sidebar: sidebar,
-    OurWork: ourWork,
-    OurGallery: ourGallery,
-    Contact: contact,
+    Sidebar,
+    Hi,
+    OurWork,
+    OurGallery,
+    Contact,
+  },
+  created() {
+    this.$store.commit("SET_ACTIVE_SECTION", 0);
+  },
+  computed: {
+    ...mapState(["activeSection"]),
+    currentSection() {
+      const sections = ["Hi", "OurWork", "OurGallery", "Contact"];
+      return sections[this.activeSection] || "Hi";
+    },
   },
 };
 </script>

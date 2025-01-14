@@ -10,13 +10,29 @@ export default {
   },
   components: { Welcome },
 
-  watch: {
-    $route(to, from) {
-      this.$store.dispatch("getCurrentUser");
-      this.$store.dispatch("getAllConversations");
+  async created() {
+    // Sayfa yüklendiğinde auth kontrolü
+    if (localStorage.getItem("token")) {
+      await this.$store.dispatch("checkAuth");
+    }
+  },
 
-      this.$store.dispatch("getConversationPartners");
-      console.log("route path değişti", this.$route.fullPath);
+  watch: {
+    $route: {
+      async handler(to) {
+        const token = localStorage.getItem("token");
+
+        // Auth gerektiren route'lar için kontrol
+        if (to.meta.requiresAuth && !token) {
+          this.$router.push("/login");
+        }
+
+        // Text sayfasına gidildiğinde auth kontrolü
+        if (to.name === "text" && token) {
+          await this.$store.dispatch("checkAuth");
+        }
+      },
+      immediate: true,
     },
   },
 };

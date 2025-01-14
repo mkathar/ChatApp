@@ -1,64 +1,47 @@
 <template>
   <div class="sidebar">
     <div class="sidebar__group">
-      <div
-        v-for="(item, index) in welcomeContent"
-        class="sidebar__group__content"
-        :class="item.isActive"
-        :key="index"
-        v-if="this.$route.name == `welcome`"
-      >
-        <img src="../assets/img/menu-item-bg.png" alt="" />
-        <Icon :name="item.contentName" />
-        <p class="sidebar__group__content__name">{{ item.displayName }}</p>
-      </div>
-      <div
-        v-for="(item, index) in processContent"
-        class="sidebar__group__content"
-        :class="item.isActive"
-        :key="index"
-        v-if="this.$route.name == `login` || this.$route.name == `signIn`"
-      >
-        <img src="../assets/img/menu-item-bg.png" alt="" />
-        <Icon :name="item.contentName" :size="item.size" />
+      <!-- Welcome içeriği için wrapper -->
+      <template v-if="$route.name === 'welcome'">
+        <div
+          v-for="(item, index) in welcomeContent"
+          class="sidebar__group__content"
+          :class="{ active: item.isActive === 'active' }"
+          :key="index"
+          @click="scrollToSection(index)"
+        >
+          <img src="../assets/img/menu-item-bg.png" alt="" />
+          <Icon :name="item.contentName" />
+          <p class="sidebar__group__content__name">{{ item.displayName }}</p>
+        </div>
+      </template>
 
-        <router-link :to="item.url" class="sidebar__group__content__name">{{
-          item.displayName
-        }}</router-link>
-      </div>
-
-      <!-- <div class="sidebar__group__content" :class="work">
-        <img src="../assets/img/menu-item-bg.png" alt="" />
-        <Icon name="work" />
-        <p>Our Work</p>
-      </div>
-      <div class="sidebar__group__content" :class="gallery">
-        <img src="../assets/img/menu-item-bg.png" alt="" />
-        <Icon name="gallery" />
-        <p class="sidebar__group__content__name">Gallery</p>
-      </div>
-      <div class="sidebar__group__content" :class="contact">
-        <img src="../assets/img/menu-item-bg.png" alt="" />
-        <Icon name="contact" />
-        <p class="sidebar__group__content__name">Contact</p>
-      </div>-->
+      <!-- Process içeriği için wrapper -->
+      <template v-if="$route.name === 'login' || $route.name === 'signIn'">
+        <div
+          v-for="(item, index) in processContent"
+          class="sidebar__group__content"
+          :class="item.isActive"
+          :key="'process-' + index"
+        >
+          <img src="../assets/img/menu-item-bg.png" alt="" />
+          <Icon :name="item.contentName" :size="item.size" />
+          <router-link :to="item.url" class="sidebar__group__content__name">
+            {{ item.displayName }}
+          </router-link>
+        </div>
+      </template>
     </div>
   </div>
 </template>
 
 <script>
-import { watch } from "vue";
 import { Icon } from "../icon";
+import { mapState } from "vuex";
 
 export default {
   data() {
     return {
-      welcomeContent: [
-        { displayName: "Our Company", contentName: "company", isActive: null },
-        { displayName: "How it Works", contentName: "work", isActive: null },
-        { displayName: "Gallery", contentName: "gallery", isActive: null },
-        { displayName: "Contact", contentName: "contact", isActive: null },
-      ],
       processContent: [
         {
           displayName: "Home",
@@ -83,20 +66,25 @@ export default {
         },
       ],
       modifier: "active",
-      company: null,
-      work: null,
-      gallery: null,
-      contact: null,
+      isScrolling: false,
     };
   },
   components: { Icon: Icon },
 
   mounted() {
-    window.addEventListener("scroll", this.onScroll);
+    window.addEventListener("keydown", this.handleKeyNavigation);
+    window.addEventListener("wheel", this.handleScroll, { passive: false });
+
+    // İlk section'ı aktif et
+    setTimeout(() => {
+      document.querySelector(".welcome__section").classList.add("active");
+    }, 100);
+
     this.routeControl();
   },
   beforeDestroy() {
-    window.removeEventListener("scroll", this.onScroll);
+    window.removeEventListener("keydown", this.handleKeyNavigation);
+    window.removeEventListener("wheel", this.handleScroll);
   },
   created() {
     this.$watch(
@@ -107,41 +95,49 @@ export default {
       }
     );
   },
+  computed: {
+    ...mapState(["welcomeSections", "activeSection"]),
+    welcomeContent() {
+      return this.welcomeSections;
+    },
+  },
   methods: {
-    onScroll(e) {
-      console.log(window.scrollY);
-      if (window.scrollY < 500 && this.$route.name == "welcome") {
-        this.welcomeContent[0].isActive = this.modifier;
-        console.log(this.modifier);
-      } else {
-        this.welcomeContent[0].isActive = null;
-      }
+    scrollToSection(index) {
+      if (this.isScrolling) return;
+      this.isScrolling = true;
+
+      this.$store.commit("SET_ACTIVE_SECTION", index);
+
+      setTimeout(() => {
+        this.isScrolling = false;
+      }, 100);
+    },
+
+    handleScroll(event) {
+      if (this.isScrolling) return;
+      event.preventDefault();
+
+      // Scroll tekerleği için
       if (
-        window.scrollY >= 500 &&
-        window.scrollY <= 1000 &&
-        this.$route.name == "welcome"
+        event.deltaY > 0 &&
+        this.activeSection < this.welcomeSections.length - 1
       ) {
-        this.welcomeContent[1].isActive = this.modifier;
-      } else {
-        this.welcomeContent[1].isActive = null;
+        this.scrollToSection(this.activeSection + 1);
+      } else if (event.deltaY < 0 && this.activeSection > 0) {
+        this.scrollToSection(this.activeSection - 1);
       }
-      if (
-        window.scrollY >= 1000 &&
-        window.scrollY <= 2000 &&
-        this.$route.name == "welcome"
+    },
+
+    handleKeyNavigation(e) {
+      if (this.$route.name !== "welcome" || this.isScrolling) return;
+
+      if (e.key === "ArrowUp" && this.activeSection > 0) {
+        this.scrollToSection(this.activeSection - 1);
+      } else if (
+        e.key === "ArrowDown" &&
+        this.activeSection < this.welcomeSections.length - 1
       ) {
-        this.welcomeContent[2].isActive = this.modifier;
-      } else {
-        this.welcomeContent[2].isActive = null;
-      }
-      if (
-        window.scrollY >= 2000 &&
-        window.scrollY <= 3000 &&
-        this.$route.name == "welcome"
-      ) {
-        this.welcomeContent[3].isActive = this.modifier;
-      } else {
-        this.welcomeContent[3].isActive = null;
+        this.scrollToSection(this.activeSection + 1);
       }
     },
     routeControl() {

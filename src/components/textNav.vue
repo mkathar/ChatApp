@@ -3,14 +3,12 @@
     <div class="nav__group">
       <img
         class="nav__group__img"
-        src=" https://picsum.photos/id/232/40/40"
+        src="https://picsum.photos/id/232/40/40"
         alt=""
       />
-      <p
-        class="nav__group__name"
-        v-if="conversationMessages.mesajlaşılanKişi"
-        v-text="conversationMessages.mesajlaşılanKişi.user_name"
-      ></p>
+      <p class="nav__group__name" v-if="activeChat">
+        {{ activeChat.display_name }}
+      </p>
     </div>
     <div class="nav__group">
       <Icon name="phone" />
@@ -48,19 +46,14 @@ export default {
   },
   methods: {
     showMessage() {
-      const textisActive = false;
-      this.$store.commit("showText", textisActive);
+      this.$store.commit("CLEAR_ACTIVE_CHAT");
     },
   },
   computed: {
     ...mapState({
-      conversationMessages: (state) => state.conversationMessages,
+      activeChat: (state) => state.activeChat,
       textActive: (state) => state.textActive,
     }),
-  },
-  mounted() {},
-  watch: {
-    textActive(to, from) {},
   },
 };
 </script>

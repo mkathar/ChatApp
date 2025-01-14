@@ -5,6 +5,7 @@
         class="textArea__group__box__input"
         type="text"
         v-model="message"
+        @keyup.enter="sendMessage"
       />
       <Icon name="send" @click="sendMessage" />
     </div>
@@ -23,43 +24,31 @@ import axiosInstance from "../services/base/baseURL";
 
 export default {
   data() {
-    return {};
+    return {
+      message: "",
+    };
   },
   methods: {
     async sendMessage() {
-      var currentdate = new Date();
-      var datetime =
-        currentdate.getDate() +
-        "-" +
-        (currentdate.getMonth() + 1) +
-        "-" +
-        currentdate.getFullYear() +
-        " " +
-        currentdate.getHours() +
-        ":" +
-        currentdate.getMinutes() +
-        ":" +
-        currentdate.getSeconds();
+      if (!this.message || !this.activeChat) return;
+
       const newMessage = {
         message_text: this.message,
-        message_time: datetime,
-        receiver_id: this.conversationMessages.mesajlaşılanKişi.user_id,
+        chat_id: this.activeChat.chat_id,
         sender_id: this.currentUser.user_id,
       };
-      console.log(newMessage);
-      if (newMessage.message_text) {
-        try {
-          const response = await axiosInstance.post("/sendmessage", newMessage);
 
-          if (response.status === 201) {
-            alert("Mesaj başarıyla gönderildi.");
-          } else {
-            alert("Mesaj gönderilirken bir hata oluştu.");
-          }
-        } catch (error) {
-          console.error("İstek sırasında bir hata oluştu:", error);
-          alert("Mesaj gönderilirken bir hata oluştu.");
+      try {
+        const response = await axiosInstance.post("/messages", newMessage);
+        if (response.data) {
+          this.message = "";
+          await this.$store.dispatch(
+            "getMessagesForPartner",
+            this.activeChat.chat_id
+          );
         }
+      } catch (error) {
+        console.error("Mesaj gönderilirken hata:", error);
       }
     },
   },
@@ -69,9 +58,7 @@ export default {
   computed: {
     ...mapState({
       currentUser: (state) => state.currentUser,
-      allConversations: (state) => state.allConversations,
-      conversationPartners: (state) => state.conversationPartners,
-      conversationMessages: (state) => state.conversationMessages,
+      activeChat: (state) => state.activeChat,
       textActive: (state) => state.textActive,
     }),
   },

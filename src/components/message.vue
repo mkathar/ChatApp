@@ -1,89 +1,81 @@
 <template>
   <div class="message-container">
-    <div class="message-container__t" v-if="conversationMessages && textActive">
+    <div class="message-container__t" v-if="activeChat">
       <div
-        v-for="message in conversationMessages.Mesajlar"
+        v-for="message in chatMessages"
         :key="message.message_id"
         :class="{
           outgoingMessage: isSentMessage(message),
-          fromMessage: isReceivedMessage(message),
+          fromMessage: !isSentMessage(message),
         }"
       >
-        <div
-          :class="{
-            outgoingMessage__group: isSentMessage(message),
-            fromMessage__group: isReceivedMessage(message),
-          }"
-        >
-          <p>{{ message.message_text }}</p>
-          <p>{{ message.message_time }}</p>
+        <div v-if="!isSentMessage(message)" class="fromMessage">
+          <div class="fromMessage__img">
+            {{ getInitials(message.sender_name) }}
+          </div>
+          <div class="fromMessage__group">
+            <p class="fromMessage__group__text">{{ message.message_text }}</p>
+          </div>
+          <p class="fromMessage__time">{{ formatTime(message.sent_at) }}</p>
+        </div>
+
+        <div v-else class="outgoingMessage">
+          <p class="outgoingMessage__time">{{ formatTime(message.sent_at) }}</p>
+          <div class="outgoingMessage__group">
+            <p class="outgoingMessage__group__text">
+              {{ message.message_text }}
+            </p>
+          </div>
+          <div class="outgoingMessage__img">
+            {{ getInitials(currentUser.user_name) }}
+          </div>
         </div>
       </div>
     </div>
-    <div class="message-container__noMessage" v-if="!textActive">
-      <h1 class="message-container__noMessage__content">
-        Henüz bir mesaj başlatmadın...
-      </h1>
+    <div class="message-container__noMessage" v-else>
+      <h1 class="message-container__noMessage__content">Bir sohbet seçin...</h1>
     </div>
   </div>
 </template>
 
 <script>
-import outgoingMessage from "./outgoingMessage.vue";
-import fromMessage from "./fromMessage.vue";
-import textNav from "./textNav.vue";
 import { mapState } from "vuex";
+
 export default {
-  data() {
-    return {
-      dizi: [1, 2, 3, 4],
-    };
-  },
-  components: {
-    OutgoingMessage: outgoingMessage,
-    FromMessage: fromMessage,
-    TextNav: textNav,
-  },
   methods: {
     isSentMessage(message) {
-      return message.sender_id === this.currentUser.user_id;
+      return message.sender_id === this.currentUser?.user_id;
     },
-    isReceivedMessage(message) {
-      return message.receiver_id === this.currentUser.user_id;
+    formatTime(timestamp) {
+      return new Date(timestamp).toLocaleTimeString("tr-TR", {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
     },
-    selam() {
-      console.log(this.textActive);
+    getInitials(name) {
+      if (!name) return "";
+      return name
+        .split(" ")
+        .map((word) => word[0])
+        .join("")
+        .toUpperCase();
     },
   },
-
   computed: {
     ...mapState({
-      conversationMessages: (state) => state.conversationMessages,
       currentUser: (state) => state.currentUser,
-      textActive: (state) => state.textActive,
+      activeChat: (state) => state.activeChat,
+      chatMessages: (state) => state.messages,
     }),
-    conversationMessagess() {
-      const sortedMessages = this.conversationMessages.Mesajlar.sort(
-        (a, b) => new Date(a.message_time) - new Date(b.message_time)
-      );
-      const groupedMessages = sortedMessages.reduce((result, message) => {
-        const key = message.sender_id === 0 ? "user" : "other";
-        result[key] = result[key] || [];
-        result[key].push(message);
-        return result;
-      }, {});
-      return [
-        ...(groupedMessages.user || []),
-        ...(groupedMessages.other || []),
-      ];
-    },
-    currentUserID() {
-      return 0;
-    },
   },
   watch: {
-    textActive(to, from) {
-      console.log(this.textActive);
+    "activeChat.chat_id": {
+      immediate: true,
+      handler(newChatId) {
+        if (newChatId) {
+          this.$store.dispatch("getMessagesForPartner", newChatId);
+        }
+      },
     },
   },
 };
