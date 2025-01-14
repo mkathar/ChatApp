@@ -1,7 +1,7 @@
 # ChatApp (WhatsApp Clone)
 
 This project is a real-time chat application inspired by WhatsApp. It allows users to send instant messages, track online statuses, and offers other essential features.
-[🇬🇧 Turkish README](README.tr.md)
+[🇹🇷 Turkish README](README.tr.md)
 **Start Date:** October 2023  
 **End Date:** Still in Development
 

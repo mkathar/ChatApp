@@ -1,8 +1,9 @@
-````markdown
 # ChatApp (WhatsApp Klonu)
 
 Bu proje, WhatsApp'tan ilham alınarak geliştirilmiş gerçek zamanlı bir sohbet uygulamasıdır. Kullanıcıların anlık mesajlar göndermesine, çevrimiçi durumları takip etmesine ve diğer temel özellikleri sunar.
+
 [🇬🇧 İngilizce README](README.md)
+
 **Başlangıç Tarihi:** Ekim 2023  
 **Bitiş Tarihi:** Hala Geliştirme Aşamasında
 
@@ -80,12 +81,14 @@ Bu proje, WhatsApp'tan ilham alınarak geliştirilmiş gerçek zamanlı bir sohb
     - Bir PostgreSQL veritabanı kurun ve yeni bir veritabanı oluşturun.
     - `.env` dosyasında veritabanı kimlik bilgilerinizi tanımlayın.
       - Örnek:
-        - PORT=3000
-        - DB_USER="kullanıcıadı"
-        - DB_PASSWORD="parola"
-        - DB_NAME="veritabanı_adı"
-        - DB_HOST=localhost
-        - DB_PORT=5432
+        ```
+        PORT=3000
+        DB_USER="kullanıcıadı"
+        DB_PASSWORD="parola"
+        DB_NAME="veritabanı_adı"
+        DB_HOST=localhost
+        DB_PORT=5432
+        ```
 
 5.  **Sunucuyu Başlatın:**
 
@@ -112,7 +115,7 @@ Veritabanı yapısı:
 - `user_settings` - Kullanıcı ayarları
 - `contacts` - Kişi listesi
 
-Not: Veritabanını oluşturmak için önce PostgreSQL'i yüklediğinizden emin olun ve İngilizce README'deki adımları takip edin.
+**Not:** Veritabanını oluşturmak için önce PostgreSQL'i yüklediğinizden emin olun ve İngilizce README'deki adımları takip edin.
 
 ## Kullanım
 
@@ -121,7 +124,6 @@ Not: Veritabanını oluşturmak için önce PostgreSQL'i yüklediğinizden emin 
 3.  Sohbet etmeye başlayın!
 
 ## Proje Yapısı
-````
 
 <pre>
 ChatApp/
@@ -180,13 +182,13 @@ ChatApp/
 │       └── baseURL.js
 ├── database/
 │   ├── controllers/
-│   │   ├── chatController.js
-│   │   ├── messageController.js
-│   │   └── userController.js
+│       ├── chatController.js
+│       ├── messageController.js
+│       └── userController.js
 │   ├── queries/
-│   │   ├── chatQueries.js
-│   │   ├── messageQueries.js
-│   │   └── userQueries.js
+│       ├── chatQueries.js
+│       ├── messageQueries.js
+│       └── userQueries.js
 │   ├── config.js
 │   ├── db.js
 │   └── dbOperations.js
@@ -227,7 +229,3 @@ Bu proje MIT Lisansı altında lisanslanmıştır.
 ## İletişim
 
 [LinkedIn](https://www.linkedin.com/in/muhammed-mustafa-katar-62a666245/)
-
-```
-
-```
